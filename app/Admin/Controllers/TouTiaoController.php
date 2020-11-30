@@ -138,8 +138,8 @@ class TouTiaoController extends Controller
         $form->image('avatar', '公众号头像')->uniqueName();
         $form->text('name', '公众号名称');
         $form->text('mp_weixin', '公众号微信号');
-        $form->select('appid', '公众号appid')->options(Mp::all()->pluck('name', 'appid'))->help('选择千牛的模板、百度自定义回传时必选');
-        $form->text('channel_id', '回传渠道号')->help('选择暴走-掌中云模板时必填');
+        $form->select('appid', '公众号appid')->options(Mp::all()->pluck('name', 'appid'))->help('选择百度自定义回传时必选');
+        $form->text('channel_id', '公众号历史链接');
         $form->select('baidu_clue', '百度转化线索')->options(BaiduClue::all()->pluck('name', 'token'))->help('百度投放付费回传时必选');
         $form->tags('rand_suffix', '随机后缀');
         $form->text('company', '公司名称');
