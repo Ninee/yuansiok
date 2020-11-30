@@ -21,3 +21,5 @@ Route::get('/test/baidu/{id}', 'TestController@baidu');
 Route::post('/visitor/save', 'VisitorController@save');
 Route::post('/baidu/debug', 'BaiduController@debug');
 Route::get('/third/backforhs', 'ThirdController@back4Hs');
+Route::post('/third/wy/user', 'ThirdController@wyNewUser');
+Route::post('/third/wy/order', 'ThirdController@wyOrder');
