@@ -75,13 +75,14 @@ class ThirdController extends Controller
             foreach ($orders as $index => $order) {
                 //检查是否已入库
                 $exist = HsOrder::where('order_num', $order['order_num'])->first();
-                //写入日志
-                $logger = new Logger('hsorders');
-                $logger->pushHandler(new StreamHandler(storage_path('logs/hs_orders.log')));
-                $logger->info('order:', $order);
                 if (!$exist) {
                     //如果是首冲，付费回传
                     if ($order['charge_count'] == 1 && $order['order_status'] == 1) {
+                        //写入日志
+                        $logger = new Logger('hsorders');
+                        $logger->pushHandler(new StreamHandler(storage_path('logs/hs_orders-' . date('Y-m-d') . '.log')));
+                        $logger->info('order:', $order);
+
                         $order['merchant_id'] = $merchant_id;
                         $hsOrder = HsOrder::create($order);
                         //百度付费回传

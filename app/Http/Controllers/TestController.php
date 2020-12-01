@@ -16,7 +16,7 @@ class TestController extends Controller
 {
     public function index()
     {
-        //        $this->testHs2Baidu();
+//                $this->testHs2Baidu();
     }
 
     public function testHs2Baidu()
@@ -66,7 +66,7 @@ class TestController extends Controller
                 $exist = HsOrder::where('order_num', $order['order_num'])->first();
                 //写入日志
                 $logger = new Logger('hsorders');
-                $logger->pushHandler(new StreamHandler(storage_path('logs/hs_orders.log')));
+                $logger->pushHandler(new StreamHandler(storage_path('logs/hs_orders-' . date('Y-m-d') . '.log')));
                 $logger->info('order:', $order);
                 if (!$exist) {
                     //如果是首冲，付费回传
