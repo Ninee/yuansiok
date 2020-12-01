@@ -16,7 +16,7 @@ class TestController extends Controller
 {
     public function index()
     {
-        $this->testHs2Baidu();
+        //        $this->testHs2Baidu();
     }
 
     public function testHs2Baidu()

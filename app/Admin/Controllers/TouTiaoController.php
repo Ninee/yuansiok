@@ -87,11 +87,12 @@ class TouTiaoController extends Controller
         $grid->model()->orderBy('id', 'desc');
         $grid->id('Id');
         $grid->remark('备注');
-        $grid->domain('投放域名');
-        $grid->column('baidu_debug', '百度联调url')->display(function ($id) {
-           return 'http://' . $this->domain . '?debug=' . $this->appid;
+        $grid->column('land_url', '投放域名')->display(function () {
+            return 'http://' . $this->domain . ($this->domain_suffix ? '/' . $this->domain_suffix : '');
         });
-        $grid->domain_suffix('域名后缀');
+        $grid->column('baidu_debug', '百度联调url')->display(function ($id) {
+           return 'http://' . $this->domain . ($this->domain_suffix ? '/' . $this->domain_suffix : '') . '?debug=' . $this->appid;
+        });
         $grid->template()->name('模板');
         $grid->title('标题');
         $grid->name('公众号');
