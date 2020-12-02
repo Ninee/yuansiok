@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Action\PageCopy;
 use App\Models\BaiduClue;
 use App\Models\Mp;
 use App\Models\Template;
@@ -12,6 +13,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Http\Request;
 
 class TouTiaoController extends Controller
 {
@@ -97,6 +99,11 @@ class TouTiaoController extends Controller
         $grid->title('标题');
         $grid->name('公众号');
         $grid->created_at('创建时间');
+        $grid->actions(function ($actions) {
+            // 去掉查看
+            $actions->disableView();
+            $actions->append(new PageCopy($actions->getKey()));
+        });
         return $grid;
     }
 
@@ -130,20 +137,30 @@ class TouTiaoController extends Controller
     {
         $form = new Form(new TouTiao);
 
-        $form->text('remark', '备注')->help('用于区分落地页，仅自己可见');
+        $form->text('remark', '备注')->required()->help('用于区分落地页，仅自己可见');
         $form->text('domain', '投放域名');
-        $form->text('domain_suffix', '域名后缀');
+        $form->text('domain_suffix', '域名后缀')->required();
         $form->select('template_id', '模板')->options(Template::all()->pluck('name', 'id'));
-        $form->text('title', '标题');
-        $form->UEditor('content', '内容');
+        $form->text('title', '标题')->required();
+        $form->UEditor('content', '内容')->required();
         $form->image('avatar', '公众号头像')->uniqueName();
-        $form->text('name', '公众号名称');
-        $form->text('mp_weixin', '公众号微信号');
-        $form->select('appid', '公众号appid')->options(Mp::all()->pluck('name', 'appid'))->help('选择百度自定义回传时必选');
+        $form->text('name', '公众号名称')->required();
+        $form->text('mp_weixin', '公众号微信号')->required();
+        $form->select('appid', '公众号appid')->options(Mp::all()->pluck('name', 'appid'))->help('选择百度自定义回传时必选')->required();
         $form->text('channel_id', '公众号历史链接');
         $form->select('baidu_clue', '百度转化线索')->options(BaiduClue::all()->pluck('name', 'token'))->help('百度投放付费回传时必选');
         $form->tags('rand_suffix', '随机后缀');
-        $form->text('company', '公司名称');
+        $form->text('company', '公司名称')->required();
         return $form;
+    }
+
+    public function copy(Request $request)
+    {
+        $id = $request->id;
+        TouTiao::find($id)->replicate()->save();
+        return response()->json([
+            "code" => 0,
+            "message" => ''
+        ]);
     }
 }

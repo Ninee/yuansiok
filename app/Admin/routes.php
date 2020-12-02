@@ -16,6 +16,7 @@ Route::group([
     $router->resource('/official', 'OfficialController');
     $router->resource('/domain', 'DomainController');
     $router->resource('/landing', 'LandingController');
+    $router->post('/page/copy', 'TouTiaoController@copy');
     $router->resource('/toutiao', 'TouTiaoController');
     $router->resource('/mps', 'MpController');
     $router->resource('/huasheng', 'HuaShengController');
