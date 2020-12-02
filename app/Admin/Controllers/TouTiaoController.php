@@ -138,8 +138,8 @@ class TouTiaoController extends Controller
         $form = new Form(new TouTiao);
 
         $form->text('remark', '备注')->required()->help('用于区分落地页，仅自己可见');
-        $form->text('domain', '投放域名');
-        $form->text('domain_suffix', '域名后缀')->required();
+        $form->text('domain', '投放域名')->required();
+        $form->text('domain_suffix', '域名后缀');
         $form->select('template_id', '模板')->options(Template::all()->pluck('name', 'id'));
         $form->text('title', '标题')->required();
         $form->UEditor('content', '内容')->required();
