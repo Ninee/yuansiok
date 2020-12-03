@@ -20,18 +20,18 @@ class ThirdController extends Controller
     const RETRY_TIMES = 3;
 
     /**
-     * 花生回传百度
+     * 花生回传
      */
     public function back4Hs()
     {
         $merchats = HuaSheng::all();
         foreach ($merchats as $merchat) {
-            $this->hs2Baidu($merchat->merchant_id);
+            $this->hs2Back($merchat->merchant_id);
         }
 
     }
 
-    public function hs2Baidu($merchant_id)
+    public function hs2Back($merchant_id)
     {
         $url = 'https://vip.rlcps.cn/api/orderList';
 //        $merchant_id = '2071';
@@ -88,15 +88,25 @@ class ThirdController extends Controller
                         //百度付费回传
                         $visitor = Visitor::where('ua', $order['ua'])->where('ip', $order['ip'])->first();
                         if ($visitor) {
-                            $page = TouTiao::find($visitor->page_id);
-                            $token = $page->baidu_clue;
-                            $cv = array(
-                                'logidUrl' => $visitor->url, // 您的落地页url
-                                'newType' => 19 // 转化类型请按实际情况填写
-                            );
-                            $conversionTypes = array($cv);
-                            $ocpc = new BaiduOcpc();
-                            $res = $ocpc->sendConvertData($token, $conversionTypes);
+                            switch ($visitor->platform) {
+                                //回传百度
+                                case Visitor::PLATFORM_BAIDU:
+                                    $page = TouTiao::find($visitor->page_id);
+                                    $token = $page->baidu_clue;
+                                    $cv = array(
+                                        'logidUrl' => $visitor->url, // 您的落地页url
+                                        'newType' => 19 // 转化类型请按实际情况填写
+                                    );
+                                    $conversionTypes = array($cv);
+                                    $ocpc = new BaiduOcpc();
+                                    $res = $ocpc->sendConvertData($token, $conversionTypes);
+                                    break;
+                                //回传头条
+                                case Visitor::PLATFORM_TOUTIAO:
+                                    $toutiao = new \App\Http\Third\Toutiao();
+                                    $res = $toutiao->sendConvertData($visitor->url, 2);
+                                    break;
+                            }
                             //回传成功，更新订单回传状态
                             if ($res) {
                                 $hsOrder->is_back = 1;
@@ -119,7 +129,7 @@ class ThirdController extends Controller
         $user = $request->all();
         $exist = WyUser::where('open_id', $user['open_id'])->first();
         $logger = new Logger('wyUser');
-        $logger->pushHandler(new StreamHandler(storage_path('logs/wy_user.log')));
+        $logger->pushHandler(new StreamHandler(storage_path('logs/wy_user-' . date('Y-m-d') . '.log')));
         $logger->info('order:', $user);
         if (!$exist) {
             WyUser::create($user);
@@ -137,24 +147,34 @@ class ThirdController extends Controller
         $order = $request->all();
         $exist = WyOrder::where('order_id', $order['order_id'])->first();
         $logger = new Logger('wyOrder');
-        $logger->pushHandler(new StreamHandler(storage_path('logs/wy_order.log')));
+        $logger->pushHandler(new StreamHandler(storage_path('logs/wy_order-' . date('Y-m-d') . '.log')));
         $logger->info('order:', $order);
         if (!$exist) {
             WyOrder::create($order);
             $new = WyUser::where('open_id', $order['open_id'])->where('is_back', 0)->first();
-            //如果是新用户，回传百度
+            //如果是新用户，付费回传
             if ($new) {
                 $visitor = Visitor::where('ua',  base64_decode($new['ua']))->where('ip', $new['ip'])->first();
                 if ($visitor) {
-                    $page = TouTiao::find($visitor->page_id);
-                    $token = $page->baidu_clue;
-                    $cv = array(
-                        'logidUrl' => $visitor->url, // 您的落地页url
-                        'newType' => 19 // 转化类型请按实际情况填写
-                    );
-                    $conversionTypes = array($cv);
-                    $ocpc = new BaiduOcpc();
-                    $res = $ocpc->sendConvertData($token, $conversionTypes);
+                    switch ($visitor->platform) {
+                        //回传百度
+                        case Visitor::PLATFORM_BAIDU:
+                            $page = TouTiao::find($visitor->page_id);
+                            $token = $page->baidu_clue;
+                            $cv = array(
+                                'logidUrl' => $visitor->url, // 您的落地页url
+                                'newType' => 19 // 转化类型请按实际情况填写
+                            );
+                            $conversionTypes = array($cv);
+                            $ocpc = new BaiduOcpc();
+                            $res = $ocpc->sendConvertData($token, $conversionTypes);
+                            break;
+                            //回传头条
+                        case Visitor::PLATFORM_TOUTIAO:
+                            $toutiao = new \App\Http\Third\Toutiao();
+                            $res = $toutiao->sendConvertData($visitor->url, 2);
+                            break;
+                    }
                     //回传成功，更新订单回传状态
                     if ($res) {
                         $new->is_back = 1;

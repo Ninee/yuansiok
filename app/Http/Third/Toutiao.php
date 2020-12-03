@@ -27,6 +27,9 @@ class Toutiao
         $response = curl_exec($ch);
         $logger->info('response:', json_decode($response, true));
         curl_close($ch);
+        if ($response) {
+            return $response;
+        }
         return false;
     }
 
