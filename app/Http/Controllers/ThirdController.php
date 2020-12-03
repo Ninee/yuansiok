@@ -87,11 +87,15 @@ class ThirdController extends Controller
                         $hsOrder = HsOrder::create($order);
                         //百度付费回传
                         $visitor = Visitor::where('ip', $order['ip'])->first();
-                        if ($visitor) {
+
+                        //判定回传概率
+                        $rand = random_int(1, 100);
+                        $page = TouTiao::find($visitor->page_id);
+                        $back_rate = $page->back_rate;
+                        if ($visitor && ($rand <= $back_rate)) {
                             switch ($visitor->platform) {
                                 //回传百度
                                 case Visitor::PLATFORM_BAIDU:
-                                    $page = TouTiao::find($visitor->page_id);
                                     $token = $page->baidu_clue;
                                     $cv = array(
                                         'logidUrl' => $visitor->url, // 您的落地页url
@@ -155,11 +159,15 @@ class ThirdController extends Controller
             //如果是新用户，付费回传
             if ($new) {
                 $visitor = Visitor::where('ip', $new['ip'])->first();
-                if ($visitor) {
+                
+                //判定回传概率
+                $rand = random_int(1, 100);
+                $page = TouTiao::find($visitor->page_id);
+                $back_rate = $page->back_rate;
+                if ($visitor && ($rand <= $back_rate)) {
                     switch ($visitor->platform) {
                         //回传百度
                         case Visitor::PLATFORM_BAIDU:
-                            $page = TouTiao::find($visitor->page_id);
                             $token = $page->baidu_clue;
                             $cv = array(
                                 'logidUrl' => $visitor->url, // 您的落地页url
