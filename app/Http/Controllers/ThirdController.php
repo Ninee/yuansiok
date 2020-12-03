@@ -86,7 +86,7 @@ class ThirdController extends Controller
                         $order['merchant_id'] = $merchant_id;
                         $hsOrder = HsOrder::create($order);
                         //百度付费回传
-                        $visitor = Visitor::where('ua', $order['ua'])->where('ip', $order['ip'])->first();
+                        $visitor = Visitor::where('ip', $order['ip'])->first();
                         if ($visitor) {
                             switch ($visitor->platform) {
                                 //回传百度
@@ -154,7 +154,7 @@ class ThirdController extends Controller
             $new = WyUser::where('open_id', $order['open_id'])->where('is_back', 0)->first();
             //如果是新用户，付费回传
             if ($new) {
-                $visitor = Visitor::where('ua',  base64_decode($new['ua']))->where('ip', $new['ip'])->first();
+                $visitor = Visitor::where('ip', $new['ip'])->first();
                 if ($visitor) {
                     switch ($visitor->platform) {
                         //回传百度
