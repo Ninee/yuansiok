@@ -92,9 +92,9 @@ class TouTiaoController extends Controller
         $grid->column('land_url', '落地页链接')->display(function () {
             return 'http://' . $this->domain . ($this->domain_suffix ? '/' . $this->domain_suffix : '');
         });
-        $grid->column('baidu_debug', '百度联调url')->display(function ($id) {
-           return 'http://' . $this->domain . ($this->domain_suffix ? '/' . $this->domain_suffix : '') . '?debug=' . $this->appid;
-        });
+//        $grid->column('baidu_debug', '百度联调url')->display(function ($id) {
+//           return 'http://' . $this->domain . ($this->domain_suffix ? '/' . $this->domain_suffix : '') . '?debug=' . $this->appid;
+//        });
         $grid->template()->name('模板');
         $grid->title('标题');
         $grid->name('公众号');

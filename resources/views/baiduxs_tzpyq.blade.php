@@ -144,20 +144,7 @@
         var integrityurl = window.location.href;
         var userAgent = navigator.userAgent;
         var ip = '{{$ip}}';
-        var debug = getUrlParam('debug');
-        if(debug == "{{$toutiao->appid}}") {
-            $.ajax({
-                type: "POST",
-                url: "/api/baidu/debug",
-                data: {
-                    url: integrityurl,
-                    page_id: "{{$toutiao->id}}"
-                },
-                success: function (msg) {
 
-                }
-            });
-        }
         $.ajax({
             type: "POST",
             url: "/api/visitor/save",
@@ -165,6 +152,8 @@
                 url: integrityurl,
                 ua: userAgent,
                 ip: ip,
+                domain: window.location.host,
+                platform: 1,
                 appid: "{{$toutiao->appid}}",
                 bd_vid: getUrlParam('bd_vid'),
                 page_id: "{{$toutiao->id}}"

@@ -23,8 +23,8 @@ class BaiduOcpc
         $reqData = array('token' => $token, 'conversionTypes' => $conversionTypes);
         //写入日志
         $logger = new Logger('hsorders');
-        $logger->pushHandler(new StreamHandler(storage_path('logs/baidu.log')));
-        $logger->info('back_to_baidu:', $reqData);
+        $logger->pushHandler(new StreamHandler(storage_path('logs/baidu-' . date('Y-m-d') . '.log')));
+        $logger->info('request:', $reqData);
         $reqData = json_encode($reqData);
         // 发送完整的请求数据
 
@@ -48,6 +48,7 @@ class BaiduOcpc
                 // do some log
 //                print_r('retry times: ' . $i . ' res: ' . $response . "\n");
                 $res = json_decode($response, true);
+                $logger->info('response:', $res);
                 // status为4，代表服务端异常，可添加重试
                 $status = $res['header']['status'];
                 if ($status !== 4) {

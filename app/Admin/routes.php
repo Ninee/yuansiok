@@ -21,5 +21,6 @@ Route::group([
     $router->resource('/mps', 'MpController');
     $router->resource('/huasheng', 'HuaShengController');
     $router->resource('/baidu_clue', 'BaiduClueController');
+    $router->resource('/templates', 'TemplateController');
     $router->post('/api/post_back/baidu', 'PostBackController@baidu');
 });
