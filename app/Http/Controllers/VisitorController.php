@@ -15,7 +15,7 @@ class VisitorController extends Controller
         //首次访问, 区分平台是否需要联调
         switch ($request->platform) {
             case Visitor::PLATFORM_BAIDU:
-                $actived = Visitor::where('platform', Visitor::PLATFORM_BAIDU)->where('page_id', $request->page_id)->first();
+                $actived = Visitor::where('platform', Visitor::PLATFORM_BAIDU)->whereNotNull('bd_vid')->where('page_id', $request->page_id)->first();
                 if (!$actived) {
                     $page = \App\TouTiao::find($request->page_id);
                     $token = $page->baidu_clue;
