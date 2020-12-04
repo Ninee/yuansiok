@@ -107,8 +107,10 @@ class ThirdController extends Controller
                                     break;
                                 //回传头条
                                 case Visitor::PLATFORM_TOUTIAO:
-                                    $toutiao = new \App\Http\Third\Toutiao();
-                                    $res = $toutiao->sendConvertData($visitor->url, 2);
+                                    if ($order->amount >= 30 ) {
+                                        $toutiao = new \App\Http\Third\Toutiao();
+                                        $res = $toutiao->sendConvertData($visitor->url, 2);
+                                    }
                                     break;
                             }
                             //回传成功，更新订单回传状态
@@ -179,8 +181,10 @@ class ThirdController extends Controller
                             break;
                             //回传头条
                         case Visitor::PLATFORM_TOUTIAO:
-                            $toutiao = new \App\Http\Third\Toutiao();
-                            $res = $toutiao->sendConvertData($visitor->url, 2);
+                            if ($order->amount >= 30 ) {
+                                $toutiao = new \App\Http\Third\Toutiao();
+                                $res = $toutiao->sendConvertData($visitor->url, 2);
+                            }
                             break;
                     }
                     //回传成功，更新订单回传状态

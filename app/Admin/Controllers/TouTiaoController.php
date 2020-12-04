@@ -149,7 +149,7 @@ class TouTiaoController extends Controller
         $form->select('appid', '公众号appid')->options(Mp::all()->pluck('name', 'appid'))->help('选择百度自定义回传时必选');
         $form->text('channel_id', '公众号历史链接');
         $form->select('baidu_clue', '百度转化线索')->options(BaiduClue::all()->pluck('name', 'token'))->help('百度投放付费回传时必选');
-        $form->radio('back_rate', '付费回传比例')->options(['100' => '100%', '90' => '90%', '80' => '80%', '70' => '70%', '60' => '60%', '50' => '50%', '40' => '40%'])->default(100)->required();
+        $form->radio('back_rate', '付费回传比例')->options(['100' => '100%', '90' => '90%', '80' => '80%', '70' => '70%', '60' => '60%', '50' => '50%', '40' => '40%'])->default(100)->required()->help('首充金额大于30的回传比例');
         $form->tags('rand_suffix', '随机后缀');
         $form->text('company', '公司名称')->required();
         return $form;
