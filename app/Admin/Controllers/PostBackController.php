@@ -31,4 +31,16 @@ class PostBackController extends Controller
         ]);
     }
 
+    public function toutiao(Request $request)
+    {
+        //查找最新一条有效访问数据
+        $visitor = Visitor::where('page_id', $request->page_id)->where('platform', Visitor::PLATFORM_TOUTIAO)->orderBy('id', 'desc')->first();
+        $ocpc = new \App\Http\Third\Toutiao();
+        $ocpc->sendConvertData($visitor->url, 2);
+        return response()->json([
+            "code" => 0,
+            "message" => ''
+        ]);
+    }
+
 }

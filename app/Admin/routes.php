@@ -23,4 +23,5 @@ Route::group([
     $router->resource('/baidu_clue', 'BaiduClueController');
     $router->resource('/templates', 'TemplateController');
     $router->post('/api/post_back/baidu', 'PostBackController@baidu');
+    $router->post('/api/post_back/toutiao', 'PostBackController@toutiao');
 });
