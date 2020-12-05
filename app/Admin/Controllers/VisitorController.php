@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\Visitor;
 use App\Http\Controllers\Controller;
+use App\TouTiao;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -80,6 +81,7 @@ class VisitorController extends Controller
     protected function grid()
     {
         $grid = new Grid(new Visitor);
+        $grid->model()->orderBy('id', 'desc');
 
         $grid->filter(function ($filter) {
             // 去掉默认的id过滤器
@@ -92,7 +94,10 @@ class VisitorController extends Controller
             Visitor::PLATFORM_BAIDU => '百度',
             Visitor::PLATFORM_TOUTIAO => '头条'
         ]);
-        $grid->url('落地页url');
+        $grid->column('page_id', '落地页')->display(function ($page_id) {
+            $page = TouTiao::find($this->page_id);
+            return $page->remark;
+        });
         $grid->bd_vid('百度转化token');
         $grid->adid('广告计划id');
 //        $grid->ua('Ua');
