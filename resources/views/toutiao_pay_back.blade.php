@@ -167,7 +167,7 @@
                 domain: window.location.host,
                 platform: 2,
                 appid: "{{$toutiao->appid}}",
-                bd_vid: getUrlParam('bd_vid'),
+                adid: getUrlParam('adid'),
                 page_id: "{{$toutiao->id}}"
             },
             success: function (msg) {

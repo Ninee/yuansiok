@@ -22,6 +22,7 @@ Route::group([
     $router->resource('/huasheng', 'HuaShengController');
     $router->resource('/baidu_clue', 'BaiduClueController');
     $router->resource('/templates', 'TemplateController');
+    $router->resource('/visitors', 'VisitorController');
     $router->post('/api/post_back/baidu', 'PostBackController@baidu');
     $router->post('/api/post_back/toutiao', 'PostBackController@toutiao');
 });

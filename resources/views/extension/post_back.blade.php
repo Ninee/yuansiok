@@ -42,15 +42,16 @@
         <div class="form-horizontal">
             <div class="form-group">
 
-                <label for="baidu" class="col-sm-2  control-label">落地页</label>
+                <label for="baidu" class="col-sm-2  control-label">计划id</label>
 
                 <div class="col-sm-8">
-                    <select id="toutiaoPage" class="form-control" style="width: 100%;" name="baiduPage">
-                        <option value=""></option>
-                        @foreach($pages as $select => $option)
-                            <option value="{{$select}}" {{$loop->first ? 'selected' : ''}}>{{$option}}</option>
-                        @endforeach
-                    </select>
+                    <div class="input-group">
+
+                        <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+
+                        <input required="1" type="text" id="toutiao_plan" name="toutiao_plan" value="" class="form-control" placeholder="输入计划id">
+
+                    </div>
 
                 </div>
             </div>
@@ -90,12 +91,14 @@
         $('#toutiaoBtn').on('click', function () {
             console.log($('#toutiaoPage').val())
             var page_id = $('#toutiaoPage').val()
+            var plan_id = $('#toutiao_plan').val()
             $.ajax({
                 method: 'post',
                 url: '/admin/api/post_back/toutiao',
                 data: {
                     _token:LA.token,
-                    page_id: page_id
+                    page_id: page_id,
+                    plan_id: plan_id
                 },
                 success: function (res) {
                     console.log(res)
