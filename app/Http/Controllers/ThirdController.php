@@ -184,7 +184,12 @@ class ThirdController extends Controller
                             if ($order['amount'] >= (30 * 100) ) {
                                 $toutiao = new \App\Http\Third\Toutiao();
                                 $res = $toutiao->sendConvertData($visitor->url, 2);
+                            } else {
+                                $res = false;
                             }
+                            break;
+                        default:
+                            $res = false;
                             break;
                     }
                     //回传成功，更新订单回传状态
