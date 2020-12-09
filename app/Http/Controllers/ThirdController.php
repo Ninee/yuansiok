@@ -107,7 +107,7 @@ class ThirdController extends Controller
                                     break;
                                 //回传头条
                                 case Visitor::PLATFORM_TOUTIAO:
-                                    if ($order->amount >= 30 ) {
+                                    if ($order['amount'] >= 30 ) {
                                         $toutiao = new \App\Http\Third\Toutiao();
                                         $res = $toutiao->sendConvertData($visitor->url, 2);
                                     }
@@ -181,7 +181,7 @@ class ThirdController extends Controller
                             break;
                             //回传头条
                         case Visitor::PLATFORM_TOUTIAO:
-                            if ($order->amount >= 30 ) {
+                            if ($order['amount'] >= (30 * 100) ) {
                                 $toutiao = new \App\Http\Third\Toutiao();
                                 $res = $toutiao->sendConvertData($visitor->url, 2);
                             }

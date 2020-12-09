@@ -36,6 +36,12 @@ class PostBackController extends Controller
         $plan_id = $request->plan_id;
         //查找最新一条有效访问数据
         $visitor = Visitor::where('adid', $plan_id)->where('platform', Visitor::PLATFORM_TOUTIAO)->orderBy('id', 'desc')->first();
+        if (!$visitor) {
+            return response()->json([
+                "code" => 500,
+                "message" => '还没有对应的真实访问记录'
+            ]);
+        }
         $ocpc = new \App\Http\Third\Toutiao();
         $ocpc->sendConvertData($visitor->url, 2);
         return response()->json([
