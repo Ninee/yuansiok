@@ -38,6 +38,7 @@ class ThirdController extends Controller
         $data = [
             "apiKey" => '184184912',
             "date" => date('Y-m-d', time()),
+//            "date" => '2020-12-11',
             "merchant_id" => $merchant_id,
             "timestamp" => time(),
         ];
@@ -85,9 +86,20 @@ class ThirdController extends Controller
 
                         $order['merchant_id'] = $merchant_id;
                         $hsOrder = HsOrder::create($order);
-                        //百度付费回传
-                        $visitor = Visitor::where('ip', $order['ip'])->first();
 
+                        //只上传当天注册用户的订单数据
+                        $subscribe = date('Y-m-d', strtotime($order['subscribe_at']));
+                        if ($subscribe != date('Y-m-d')) {
+                            $logger->warn('warn:', ['message' => '非当天注册用户']);
+                            continue;
+                        }
+
+                        //查询落地页访问记录
+                        $visitor = Visitor::where('ip', $order['ip'])->first();
+                        if (!$visitor) {
+                            $logger->warn('warn:', ['message' => '无对应访问记录']);
+                            continue;
+                        }
                         //判定回传概率
                         $rand = random_int(1, 100);
                         $page = TouTiao::find($visitor->page_id);
@@ -158,14 +170,22 @@ class ThirdController extends Controller
         if (!$exist) {
             WyOrder::create($order);
             $new = WyUser::where('open_id', $order['open_id'])->where('is_back', 0)->first();
+
             //如果是新用户，付费回传
             if ($new) {
+                //只上传当天注册用户的订单数据
+                if ($new->reg_time != date('Y-m-d')) {
+                    $logger->warn('warn:', ['message' => '非当天注册用户']);
+                    return response('ok-not valid reg date');
+                }
+
                 $visitor = Visitor::where('ip', $new['ip'])->first();
                 
                 //判定回传概率
                 $rand = random_int(1, 100);
                 $page = TouTiao::find($visitor->page_id);
                 $back_rate = $page->back_rate;
+
                 if ($visitor && ($rand <= $back_rate)) {
                     switch ($visitor->platform) {
                         //回传百度
