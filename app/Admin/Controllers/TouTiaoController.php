@@ -89,6 +89,11 @@ class TouTiaoController extends Controller
         $grid->model()->orderBy('id', 'desc');
         $grid->id('Id');
         $grid->remark('备注');
+        $grid->filter(function ($filter) {
+            // 去掉默认的id过滤器
+            $filter->disableIdFilter();
+            $filter->like('remark', '备注（包含)');
+        });
         $grid->column('land_url', '落地页链接')->display(function () {
             return 'http://' . $this->domain . ($this->domain_suffix ? '/' . $this->domain_suffix : '');
         });
