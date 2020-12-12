@@ -26,7 +26,7 @@ class TestController extends Controller
     public function budan(Request $request)
     {
         $order_sn = $request->order;
-        $order = WyOrder::where('order_id', $order)->first()->toArray();
+        $order = WyOrder::where('order_id', $order_sn)->first()->toArray();
         if (!$order) {
             return response('订单未找到');
         }
