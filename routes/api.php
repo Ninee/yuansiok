@@ -17,6 +17,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::get('/test', 'TestController@index');
+Route::get('/budan', 'TestController@budan');
 Route::get('/test/baidu/{id}', 'TestController@baidu');
 Route::post('/visitor/save', 'VisitorController@save');
 Route::post('/baidu/debug', 'BaiduController@debug');

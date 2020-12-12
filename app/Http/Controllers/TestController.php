@@ -6,6 +6,8 @@ use App\Http\Third\BaiduOcpc;
 use App\Models\HsOrder;
 use App\Models\HuaSheng;
 use App\Models\Visitor;
+use App\Models\WyOrder;
+use App\Models\WyUser;
 use App\TouTiao;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -17,8 +19,69 @@ class TestController extends Controller
     public function index()
     {
 //                $this->testHs2Baidu();
-        $visitor = Visitor::where('ip', '127.0.0.1')->orderBy('id', 'desc')->first();
-        dd($visitor);
+//        $visitor = Visitor::where('ip', '127.0.0.1')->orderBy('id', 'desc')->first();
+//        dd($visitor);
+    }
+
+    public function budan(Request $request)
+    {
+        $order = $request->order;
+        $exist = WyOrder::where('order_id', $order)->first()->toArray();
+        if (!$exist) {
+            return response('订单未找到');
+        }
+        print_r($exist);
+        $logger = new Logger('budan');
+        $logger->pushHandler(new StreamHandler(storage_path('logs/budan-' . date('Y-m-d') . '.log')));
+        $logger->info('order:', $order);
+        $new = WyUser::where('open_id', $order['open_id'])->where('is_back', 0)->first();
+        //如果是新用户，付费回传
+        if ($new) {
+            //只上传当天注册用户的订单数据
+//                if ($new->reg_time != date('Y-m-d')) {
+//                    $logger->warn('warn:', ['message' => '非当天注册用户']);
+//                    return response('ok-not valid reg date');
+//                }
+
+            $visitor = Visitor::where('ip', $new['ip'])->orderBy('id', 'desc')->first();
+
+            //判定回传概率
+            $page = TouTiao::find($visitor->page_id);
+
+            if ($visitor) {
+                switch ($visitor->platform) {
+                    //回传百度
+                    case Visitor::PLATFORM_BAIDU:
+                        $token = $page->baidu_clue;
+                        $cv = array(
+                            'logidUrl' => $visitor->url, // 您的落地页url
+                            'newType' => 19 // 转化类型请按实际情况填写
+                        );
+                        $conversionTypes = array($cv);
+                        $ocpc = new BaiduOcpc();
+                        $res = $ocpc->sendConvertData($token, $conversionTypes);
+                        break;
+                    //回传头条
+                    case Visitor::PLATFORM_TOUTIAO:
+                        if ($order['amount'] >= (30 * 100) ) {
+                            $toutiao = new \App\Http\Third\Toutiao();
+                            $res = $toutiao->sendConvertData($visitor->url, 2);
+                        } else {
+                            $res = false;
+                        }
+                        break;
+                    default:
+                        $res = false;
+                        break;
+                }
+                //回传成功，更新订单回传状态
+                if ($res) {
+                    $new->is_back = 1;
+                    $new->save();
+                    print_r($res);
+                }
+            }
+        }
     }
 
     public function testHs2Baidu()
