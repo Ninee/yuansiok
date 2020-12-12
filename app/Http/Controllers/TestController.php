@@ -44,6 +44,9 @@ class TestController extends Controller
 //                }
 
             $visitor = Visitor::where('ip', $new['ip'])->orderBy('id', 'desc')->first();
+            if (!$visitor) {
+                return response('未找到对应IP的访客记录');
+            }
 
             //判定回传概率
             $page = TouTiao::find($visitor->page_id);

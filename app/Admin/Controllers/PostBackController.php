@@ -6,6 +6,7 @@ namespace App\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Third\BaiduOcpc;
+use App\Models\VirtualBackRecord;
 use App\Models\Visitor;
 use App\TouTiao;
 use Illuminate\Http\Request;
@@ -25,6 +26,11 @@ class PostBackController extends Controller
         $conversionTypes = array($cv);
         $ocpc = new BaiduOcpc();
         $ocpc->sendConvertData($token, $conversionTypes);
+        VirtualBackRecord::create([
+            'platform' => '百度',
+            'page_remark' => $page->remark,
+            'page_url' => $visitor->url
+        ]);
         return response()->json([
             "code" => 0,
             "message" => ''
@@ -44,6 +50,13 @@ class PostBackController extends Controller
         }
         $ocpc = new \App\Http\Third\Toutiao();
         $ocpc->sendConvertData($visitor->url, 2);
+        $page =  TouTiao::find($visitor->page_id);
+        VirtualBackRecord::create([
+            'platform' => '头条',
+            'adid' => $plan_id,
+            'page_remark' => $page->remark,
+            'page_url' => $visitor->url
+        ]);
         return response()->json([
             "code" => 0,
             "message" => ''

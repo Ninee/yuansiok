@@ -13,4 +13,9 @@ class PostBack
         $pages = TouTiao::all()->pluck('remark', 'id');
         return view('extension.post_back', compact('pages'));
     }
+
+    public static function record()
+    {
+        return view('extension.post_back_record');
+    }
 }

@@ -79,6 +79,7 @@
                     console.log(res)
                     if(res.code == 0){
                         toastr.success('操作成功');
+                        $.pjax.reload('#pjax-container');
                     } else {
                         toastr.error(res.message);
                     }
@@ -104,6 +105,7 @@
                     console.log(res)
                     if(res.code == 0){
                         toastr.success('操作成功');
+                        $.pjax.reload('#pjax-container');
                     } else {
                         toastr.error(res.message);
                     }

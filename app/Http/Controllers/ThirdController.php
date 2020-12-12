@@ -88,11 +88,11 @@ class ThirdController extends Controller
                         $hsOrder = HsOrder::create($order);
 
                         //只上传当天注册用户的订单数据
-//                        $subscribe = date('Y-m-d', strtotime($order['subscribe_at']));
-//                        if ($subscribe != date('Y-m-d')) {
-//                            $logger->warn('warn:', ['message' => '非当天注册用户']);
-//                            continue;
-//                        }
+                        $subscribe = date('Y-m-d', strtotime($order['subscribe_at']));
+                        if ($subscribe != date('Y-m-d')) {
+                            $logger->warn('warn:', ['message' => '非当天注册用户']);
+                            continue;
+                        }
 
                         //查询落地页访问记录
                         $visitor = Visitor::where('ip', $order['ip'])->orderBy('id', 'desc')->first();
@@ -174,10 +174,11 @@ class ThirdController extends Controller
             //如果是新用户，付费回传
             if ($new) {
                 //只上传当天注册用户的订单数据
-//                if ($new->reg_time != date('Y-m-d')) {
-//                    $logger->warn('warn:', ['message' => '非当天注册用户']);
-//                    return response('ok-not valid reg date');
-//                }
+                $reg_time = date('Y-m-d', strtotime($new->reg_time));
+                if ($reg_time != date('Y-m-d')) {
+                    $logger->warn('warn:', ['message' => '非当天注册用户']);
+                    return response('ok-not valid reg date');
+                }
 
                 $visitor = Visitor::where('ip', $new['ip'])->orderBy('id', 'desc')->first();
                 
