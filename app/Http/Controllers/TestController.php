@@ -17,6 +17,8 @@ class TestController extends Controller
     public function index()
     {
 //                $this->testHs2Baidu();
+        $visitor = Visitor::where('ip', '127.0.0.1')->orderBy('id', 'desc')->first();
+        dd($visitor);
     }
 
     public function testHs2Baidu()

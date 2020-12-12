@@ -95,7 +95,7 @@ class ThirdController extends Controller
                         }
 
                         //查询落地页访问记录
-                        $visitor = Visitor::where('ip', $order['ip'])->first();
+                        $visitor = Visitor::where('ip', $order['ip'])->orderBy('id', 'desc')->first();
                         if (!$visitor) {
                             $logger->warn('warn:', ['message' => '无对应访问记录']);
                             continue;
@@ -179,7 +179,7 @@ class ThirdController extends Controller
                     return response('ok-not valid reg date');
                 }
 
-                $visitor = Visitor::where('ip', $new['ip'])->first();
+                $visitor = Visitor::where('ip', $new['ip'])->orderBy('id', 'desc')->first();
                 
                 //判定回传概率
                 $rand = random_int(1, 100);
