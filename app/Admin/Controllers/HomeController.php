@@ -67,4 +67,15 @@ class HomeController extends Controller
 
             });
     }
+
+    public function supply(Content $content)
+    {
+        return $content
+            ->header('补单')
+            ->row(function (Row $row) {
+                $row->column(12, function (Column $column) {
+                    $column->append(PostBack::supply());
+                });
+            });
+    }
 }

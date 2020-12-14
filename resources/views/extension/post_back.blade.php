@@ -61,7 +61,6 @@
     <!-- /.box-body -->
 
 </div>
-
 <script>
     $(function () {
         $('#baiduPage').select2().trigger('change');

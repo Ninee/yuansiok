@@ -13,6 +13,7 @@
         "james.xue/login-captcha-username": "^1.2",
         "laravel/framework": "5.5.*",
         "laravel/tinker": "~1.0",
+        "maatwebsite/excel": "^3.1",
         "overtrue/laravel-wechat": "^5.1",
         "overtrue/pinyin": "^4.0",
         "zgldh/qiniu-laravel-storage": "^0.10.3"
@@ -60,5 +61,11 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "optimize-autoloader": true
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
     }
 }

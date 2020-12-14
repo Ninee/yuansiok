@@ -8,6 +8,9 @@ use App\TouTiao;
 
 class PostBack
 {
+    const BOOK_PLATFORM_HS = 1;
+    const BOOK_PLATFORM_WY = 2;
+
     public static function home()
     {
         $pages = TouTiao::all()->pluck('remark', 'id');
@@ -17,5 +20,10 @@ class PostBack
     public static function record()
     {
         return view('extension.post_back_record');
+    }
+
+    public static function supply()
+    {
+        return view('extension.supply');
     }
 }
