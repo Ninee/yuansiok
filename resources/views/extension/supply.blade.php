@@ -74,6 +74,7 @@
                     <th>充值金额</th>
                     <th>下单时间</th>
                     <th>关注时间</th>
+                    <th>计划id</th>
                     <th>落地页url</th>
                     <th>访问IP</th>
                     <th>操作</th>
@@ -94,7 +95,7 @@
         {
             var table = '';
             for(var i = 0; i < data.length; i ++) {
-                var tr = '<tr>' + '<td>'+ data[i].order_id + '</td>' + '<td>'+ data[i].amount / 100 + '</td>' + '<td>'+ data[i].order_time + '</td>' + '<td>'+ data[i].reg_time + '</td>' + '</td>' + '<td>'+ data[i].url + '</td>' + '<td>'+ data[i].ip + '</td>' + '<td>'+ "<button class='supply-btn btn btn-danger' data-order='"+ data[i].order_id +"'>补单</button>" + '</td>' + '</tr>';
+                var tr = '<tr>' + '<td>'+ data[i].order_id + '</td>' + '<td>'+ data[i].amount / 100 + '</td>' + '<td>'+ data[i].order_time + '</td>' + '<td>'+ data[i].reg_time + '</td>' + '</td>' + '<td>'+ data[i].adid + '</td>' + '<td>'+ data[i].url + '</td>' + '<td>'+ data[i].ip + '</td>' + '<td>'+ "<button class='supply-btn btn btn-danger' data-order='"+ data[i].order_id +"'>补单</button>" + '</td>' + '</tr>';
                 table += tr;
             }
             $('#data').html(table);
