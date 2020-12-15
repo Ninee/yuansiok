@@ -81,6 +81,7 @@ class RawController extends Controller
     {
         $grid = new Grid(new Raw);
 
+        $grid->model()->orderBy('id', 'desc');
         $grid->id('Id');
         $grid->img('图片')->image();
         $grid->column('title', '文案');

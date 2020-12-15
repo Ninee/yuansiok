@@ -9,6 +9,13 @@ class RawController extends Controller
 {
     public function upload(Request $request)
     {
+        $has = Raw::where('img', $request->img)->where('title', $request->title)->first();
+        if ($has) {
+            return response()->json([
+                'code' => 10086,
+                'message' => '该素材已经存在，无须重复采集'
+            ]);
+        }
         Raw::create($request->all());
 
         return response()->json([
