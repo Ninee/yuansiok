@@ -24,3 +24,4 @@ Route::post('/baidu/debug', 'BaiduController@debug');
 Route::get('/third/backforhs', 'ThirdController@back4Hs');
 Route::post('/third/wy/user', 'ThirdController@wyNewUser');
 Route::post('/third/wy/order', 'ThirdController@wyOrder');
+Route::post('/raw/upload', 'RawController@upload');

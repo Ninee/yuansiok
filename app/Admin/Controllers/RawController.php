@@ -2,16 +2,15 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Visitor;
+use App\Models\Raw;
 use App\Http\Controllers\Controller;
-use App\TouTiao;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 
-class VisitorController extends Controller
+class RawController extends Controller
 {
     use HasResourceActions;
 
@@ -80,34 +79,13 @@ class VisitorController extends Controller
      */
     protected function grid()
     {
-        $grid = new Grid(new Visitor);
-        $grid->model()->orderBy('id', 'desc');
-
-        $grid->filter(function ($filter) {
-            // 去掉默认的id过滤器
-            $filter->disableIdFilter();
-            $filter->equal('adid', '广告计划id');
-        });
+        $grid = new Grid(new Raw);
 
         $grid->id('Id');
-        $grid->platform('平台')->using([
-            Visitor::PLATFORM_BAIDU => '百度',
-            Visitor::PLATFORM_TOUTIAO => '头条'
-        ]);
-        $grid->column('page_id', '落地页')->display(function ($page_id) {
-            $page = TouTiao::find($this->page_id);
-            if (!$page) {
-                return '落地页已删除';
-            }
-            return $page->remark;
-        });
-        $grid->bd_vid('百度转化token');
-        $grid->adid('广告计划id');
-//        $grid->ua('Ua');
-        $grid->ip('Ip');
-//        $grid->appid('Appid');
-        $grid->created_at('访问时间');
-
+        $grid->img('图片')->image();
+        $grid->column('title', '文案');
+        $grid->created_at('上传时间');
+        $grid->disableTools();
         $grid->disableActions();
 
         return $grid;
@@ -121,20 +99,13 @@ class VisitorController extends Controller
      */
     protected function detail($id)
     {
-        $show = new Show(Visitor::findOrFail($id));
+        $show = new Show(Raw::findOrFail($id));
 
         $show->id('Id');
-        $show->url('Url');
-        $show->ua('Ua');
-        $show->ip('Ip');
-        $show->appid('Appid');
-        $show->bd_vid('Bd vid');
+        $show->img('Img');
+        $show->title('Title');
         $show->created_at('Created at');
         $show->updated_at('Updated at');
-        $show->page_id('Page id');
-        $show->domain('Domain');
-        $show->platform('Platform');
-        $show->adid('Adid');
 
         return $show;
     }
@@ -146,17 +117,10 @@ class VisitorController extends Controller
      */
     protected function form()
     {
-        $form = new Form(new Visitor);
+        $form = new Form(new Raw);
 
-        $form->textarea('url', 'Url');
-        $form->textarea('ua', 'Ua');
-        $form->ip('ip', 'Ip');
-        $form->text('appid', 'Appid');
-        $form->text('bd_vid', 'Bd vid');
-        $form->number('page_id', 'Page id');
-        $form->text('domain', 'Domain');
-        $form->number('platform', 'Platform')->default(1);
-        $form->text('adid', 'Adid');
+        $form->image('img', '图片');
+        $form->text('title', '文案');
 
         return $form;
     }
