@@ -85,8 +85,12 @@ class RawController extends Controller
         $grid->id('Id');
         $grid->img('图片')->image();
         $grid->column('title', '文案');
+        $grid->column('name', '上传者');
         $grid->created_at('上传时间');
-        $grid->disableTools();
+        $grid->filter(function ($filter) {
+            $filter->disableIdFilter();
+            $filter->like('name', '上传者');
+        });
         $grid->disableActions();
 
         return $grid;
@@ -122,7 +126,7 @@ class RawController extends Controller
 
         $form->image('img', '图片');
         $form->text('title', '文案');
-
+        $form->hidden('name', '上传者')->default('管理员');
         return $form;
     }
 }

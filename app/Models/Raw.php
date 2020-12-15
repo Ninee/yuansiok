@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Raw extends Model
 {
     protected $fillable = [
-        'img', 'title'
+        'img', 'title', 'name'
     ];
 }
