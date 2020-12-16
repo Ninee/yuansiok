@@ -140,6 +140,7 @@
         })
         $('#data').on('click', '.supply-btn', function () {
             var order = $(this).data('order');
+            var that = this
             $.ajax({
                 method: 'post',
                 url: '/admin/api/supply',
@@ -149,6 +150,7 @@
                 },
                 success: function (res) {
                     console.log(res)
+                    $(that).parent().parent().remove();
                     if(res.code == 0){
                         toastr.success('操作成功');
                     } else {
