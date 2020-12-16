@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Third\BaiduOcpc;
 use App\Http\Third\Toutiao;
+use App\Http\Third\UcOcpc;
 use App\Models\Visitor;
 use Illuminate\Http\Request;
 
@@ -35,6 +36,15 @@ class VisitorController extends Controller
                 if (!$actived) {
                     $toutiao = new Toutiao();
                     $toutiao->sendConvertData($request->url, 2);
+                }
+                break;
+            case Visitor::PLATFORM_UC:
+                if ($request->get('uctrackid')) {
+                    $actived = Visitor::where('domain', $request->domain)->where('platform', Visitor::PLATFORM_UC)->first();
+                    if (!$actived) {
+                        $uc = new UcOcpc();
+                        $uc->sendConvertData($request->url, 13);//在线咨询
+                    }
                 }
                 break;
         }
