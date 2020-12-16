@@ -23,7 +23,7 @@ class VisitorController extends Controller
                         $token = $page->baidu_clue;
                         $cv = array(
                             'logidUrl' => $request->url, // 您的落地页url
-                            'newType' => 19 // 转化类型请按实际情况填写
+                            'newType' => 19 // 一句话咨询
                         );
                         $conversionTypes = array($cv);
                         $ocpc = new BaiduOcpc();
@@ -35,7 +35,7 @@ class VisitorController extends Controller
                 $actived = Visitor::where('domain', $request->domain)->where('platform', Visitor::PLATFORM_TOUTIAO)->first();
                 if (!$actived) {
                     $toutiao = new Toutiao();
-                    $toutiao->sendConvertData($request->url, 2);
+                    $toutiao->sendConvertData($request->url, 2); //付费
                 }
                 break;
             case Visitor::PLATFORM_UC:
@@ -43,7 +43,7 @@ class VisitorController extends Controller
                     $actived = Visitor::where('domain', $request->domain)->where('platform', Visitor::PLATFORM_UC)->first();
                     if (!$actived) {
                         $uc = new UcOcpc();
-                        $uc->sendConvertData($request->url, 13);//在线咨询
+                        $uc->sendConvertData($request->url, 13); //在线咨询
                     }
                 }
                 break;

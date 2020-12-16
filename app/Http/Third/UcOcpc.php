@@ -17,7 +17,7 @@ class UcOcpc
         $logger->pushHandler(new StreamHandler(storage_path('logs/uc-' . date('Y-m-d') . '.log')));
         $logger->info('request:', $reqData);
 
-        $api = 'https://huichuan.uc.cn/callback/ct/add?link=' . urlencode($url) . '&event_type=' . $event_type;
+        $api = 'https://huichuan.uc.cn/callback/ct/add?link=' . urlencode($url) . '&event_type=' . $event_type . '&event_time=' . time() * 1000 . '&source=ys';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $api);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
