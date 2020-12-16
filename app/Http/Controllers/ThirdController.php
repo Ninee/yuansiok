@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 
 use App\Http\Third\BaiduOcpc;
+use App\Http\Third\UcOcpc;
 use App\Models\HsOrder;
 use App\Models\HuaSheng;
 use App\Models\Visitor;
@@ -17,7 +18,57 @@ use Monolog\Logger;
 
 class ThirdController extends Controller
 {
-    const RETRY_TIMES = 3;
+    const RETRY_TIMES = 3;  //重试次数
+
+    /**
+     * @param $visitor
+     * @param $amount 单位为分
+     * @return bool|string
+     * @throws \Exception
+     */
+    public function postBack($visitor, $amount)
+    {
+        //判定回传概率
+        $rand = random_int(1, 100);
+        $page = TouTiao::find($visitor->page_id);
+        $back_rate = $page->back_rate;
+
+        if ($visitor && ($rand <= $back_rate)) {
+            switch ($visitor->platform) {
+                //回传百度
+                case Visitor::PLATFORM_BAIDU:
+                    $token = $page->baidu_clue;
+                    $cv = array(
+                        'logidUrl' => $visitor->url, // 您的落地页url
+                        'newType' => 19 // 一句话咨询
+                    );
+                    $conversionTypes = array($cv);
+                    $ocpc = new BaiduOcpc();
+                    $res = $ocpc->sendConvertData($token, $conversionTypes);
+                    break;
+                //回传头条
+                case Visitor::PLATFORM_TOUTIAO:
+                    //充值金额大于30元才回传
+                    if ($amount >= 3000 ) {
+                        $toutiao = new \App\Http\Third\Toutiao();
+                        $res = $toutiao->sendConvertData($visitor->url, 2); //付费
+                    } else {
+                        $res = false;
+                    }
+                    break;
+                case Visitor::PLATFORM_UC:
+                    //回传UC
+                    $uc = new UcOcpc();
+                    $res = $uc->sendConvertData($visitor->url, 13); //在线咨询
+                    break;
+                default:
+                    $res = false;
+                    break;
+            }
+            return $res;
+        }
+        return false;
+    }
 
     /**
      * 花生回传
@@ -100,36 +151,13 @@ class ThirdController extends Controller
                             $logger->warn('warn:', ['message' => '无对应访问记录']);
                             continue;
                         }
-                        //判定回传概率
-                        $rand = random_int(1, 100);
-                        $page = TouTiao::find($visitor->page_id);
-                        $back_rate = $page->back_rate;
-                        if ($visitor && ($rand <= $back_rate)) {
-                            switch ($visitor->platform) {
-                                //回传百度
-                                case Visitor::PLATFORM_BAIDU:
-                                    $token = $page->baidu_clue;
-                                    $cv = array(
-                                        'logidUrl' => $visitor->url, // 您的落地页url
-                                        'newType' => 19 // 转化类型请按实际情况填写
-                                    );
-                                    $conversionTypes = array($cv);
-                                    $ocpc = new BaiduOcpc();
-                                    $res = $ocpc->sendConvertData($token, $conversionTypes);
-                                    break;
-                                //回传头条
-                                case Visitor::PLATFORM_TOUTIAO:
-                                    if ($order['amount'] >= 30 ) {
-                                        $toutiao = new \App\Http\Third\Toutiao();
-                                        $res = $toutiao->sendConvertData($visitor->url, 2);
-                                    }
-                                    break;
-                            }
-                            //回传成功，更新订单回传状态
-                            if ($res) {
-                                $hsOrder->is_back = 1;
-                                $hsOrder->save();
-                            }
+
+                        //回传
+                        $res = $this->postBack($visitor, $order['amount'] * 100);
+                        //回传成功，更新订单回传状态
+                        if ($res) {
+                            $hsOrder->is_back = 1;
+                            $hsOrder->save();
                         }
                     }
                 }
@@ -181,43 +209,16 @@ class ThirdController extends Controller
                 }
 
                 $visitor = Visitor::where('ip', $new['ip'])->orderBy('id', 'desc')->first();
-                
-                //判定回传概率
-                $rand = random_int(1, 100);
-                $page = TouTiao::find($visitor->page_id);
-                $back_rate = $page->back_rate;
-
-                if ($visitor && ($rand <= $back_rate)) {
-                    switch ($visitor->platform) {
-                        //回传百度
-                        case Visitor::PLATFORM_BAIDU:
-                            $token = $page->baidu_clue;
-                            $cv = array(
-                                'logidUrl' => $visitor->url, // 您的落地页url
-                                'newType' => 19 // 转化类型请按实际情况填写
-                            );
-                            $conversionTypes = array($cv);
-                            $ocpc = new BaiduOcpc();
-                            $res = $ocpc->sendConvertData($token, $conversionTypes);
-                            break;
-                            //回传头条
-                        case Visitor::PLATFORM_TOUTIAO:
-                            if ($order['amount'] >= (30 * 100) ) {
-                                $toutiao = new \App\Http\Third\Toutiao();
-                                $res = $toutiao->sendConvertData($visitor->url, 2);
-                            } else {
-                                $res = false;
-                            }
-                            break;
-                        default:
-                            $res = false;
-                            break;
-                    }
-                    //回传成功，更新订单回传状态
-                    if ($res) {
-                        $new->is_back = 1;
-                        $new->save();
-                    }
+                if (!$visitor) {
+                    $logger->warn('warn:', ['message' => '无对应访问记录']);
+                    return response('ok-not valid visitor');
+                }
+                //回传
+                $res = $this->postBack($visitor, $order['amount']);
+                //回传成功，更新订单回传状态
+                if ($res) {
+                    $new->is_back = 1;
+                    $new->save();
                 }
             }
         }
