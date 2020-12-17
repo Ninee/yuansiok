@@ -108,7 +108,7 @@ class PostBackController extends Controller
         }
         //如果是新用户，付费回传
         if ($new) {
-            $visitor = Visitor::where('ip', $new['ip'])->orderBy('id', 'desc')->first();
+            $visitor = Visitor::where('ip', $new['ip'])->where('adid', $request->adid)->first();
             if (!$visitor) {
                 return response()->json([
                     'code' => 500,
@@ -116,7 +116,6 @@ class PostBackController extends Controller
                 ]);
             }
 
-            //判定回传概率
             $page = TouTiao::find($visitor->page_id);
 
             if ($visitor) {
@@ -168,7 +167,7 @@ class PostBackController extends Controller
             array_push($ids, $order[0]);
         }
         $in = implode(',', $ids);
-        $sql = "SELECT * FROM `visitors`, `wy_orders`, `wy_users` WHERE wy_orders.open_id = wy_users.open_id AND wy_users.ip = visitors.ip AND wy_users.is_back = 0 AND wy_orders.order_id in({$in}) GROUP BY wy_orders.order_id";
+        $sql = "SELECT * FROM `visitors`, `wy_orders`, `wy_users` WHERE wy_orders.open_id = wy_users.open_id AND wy_users.ip = visitors.ip AND wy_users.is_back = 0 AND wy_orders.order_id in({$in}) GROUP BY visitors.ip";
         $result = DB::select($sql);
         return response()->json([
             'data' => $result,

@@ -43,7 +43,7 @@ class TestController extends Controller
 //                    return response('ok-not valid reg date');
 //                }
 
-            $visitor = Visitor::where('ip', $new['ip'])->orderBy('id', 'desc')->first();
+            $visitor = Visitor::where('ip', $new['ip'])->orderBy('id', 'asc')->first();
             if (!$visitor) {
                 return response('未找到对应IP的访客记录');
             }
