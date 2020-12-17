@@ -129,7 +129,7 @@ class PcLandingController extends Controller
         $form = new Form(new PcLanding);
 
         $form->text('domain', '投放域名')->required();
-        $form->text('domain_suffix', '域名后缀')->required();
+        $form->text('domain_suffix', '域名后缀');
         $form->select('template_id', '模板')->options(Template::orderBy('id', 'desc')->pluck('name', 'id'))->required();
         $form->text('title', '标题')->required();
         $form->UEditor('content', '内容')->required();

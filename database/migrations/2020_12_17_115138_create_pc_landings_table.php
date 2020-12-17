@@ -21,7 +21,7 @@ class CreatePcLandingsTable extends Migration
             $table->integer('reader');
             $table->string('company');
             $table->string('domain');
-            $table->string('domain_suffix');
+            $table->string('domain_suffix')->nullable();
             $table->timestamps();
         });
     }
