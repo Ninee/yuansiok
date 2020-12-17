@@ -26,10 +26,11 @@ class TestController extends Controller
     public function budan(Request $request)
     {
         $order_sn = $request->order;
-        $order = WyOrder::where('order_id', $order_sn)->first()->toArray();
+        $order = WyOrder::where('order_id', $order_sn)->first();
         if (!$order) {
             return response('订单未找到');
         }
+        $order = $order->toArray();
         print_r($order);
         $logger = new Logger('budan');
         $logger->pushHandler(new StreamHandler(storage_path('logs/budan-' . date('Y-m-d') . '.log')));

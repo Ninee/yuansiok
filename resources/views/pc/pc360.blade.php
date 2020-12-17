@@ -95,7 +95,6 @@
         <div class="novel-main">
             <div class="novel-text">
         <div class="novel-banner">
-        <img src="{{asset('pc/360/images/234.gif')}}" style="width:100%;height:100%;display:block;marging:0">
         </div><div id="content-novel">
                     {!! $landing->content !!}
                 </div></div></div>
