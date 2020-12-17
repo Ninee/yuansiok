@@ -104,7 +104,7 @@
         {
             var table = '';
             for(var i = 0; i < data.length; i ++) {
-                var tr = '<tr>' + '<td>'+ data[i].order_id + '</td>' + '<td>'+ data[i].amount / 100 + '</td>' + '<td>'+ data[i].order_time + '</td>' + '<td>'+ data[i].reg_time + '</td>' + '</td>' + "<td data-adid='"+ data[i].adid + "'>" + data[i].adid + '</td>' + '<td style="width: 150px;">'+ data[i].url + '</td>' + '<td>'+ data[i].ip + '</td>' + '<td>'+ "<button class='supply-btn btn btn-danger' data-order='"+ data[i].order_id +"'>补单</button>" + '</td>' + '</tr>';
+                var tr = '<tr>' + '<td>'+ data[i].order_id + '</td>' + '<td>'+ data[i].amount / 100 + '</td>' + '<td>'+ data[i].order_time + '</td>' + '<td>'+ data[i].reg_time + '</td>' + '</td>' + "<td>" + data[i].adid + '</td>' + '<td style="width: 150px;">'+ data[i].url + '</td>' + '<td>'+ data[i].ip + '</td>' + '<td>'+ "<button class='supply-btn btn btn-danger' data-order='"+ data[i].order_id + "' data-adid='" + data[i].adid  +"'>补单</button>" + '</td>' + '</tr>';
                 table += tr;
             }
             $('#data').html(table);
