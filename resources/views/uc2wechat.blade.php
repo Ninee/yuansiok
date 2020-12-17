@@ -7,11 +7,6 @@
   <meta name="format-detection" content="telephone=no"> 
   <title>{{$toutiao->title}}</title>
   <style>
-        body {
-            font-size: 12px;
-          
-        }
-
         .main {
             width: 100%;
             max-width: 414px;
