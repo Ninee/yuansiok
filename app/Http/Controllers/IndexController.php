@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Domain;
 use App\Models\Landing;
 use App\Models\OfficialAccount;
+use App\Models\PcLanding;
 use App\Models\RandomMp;
 use App\Models\Template;
 use App\TouTiao;
@@ -19,6 +20,30 @@ class IndexController extends Controller
         return view('index', [
             'random' => $random,
             'official' => $official
+        ]);
+    }
+
+    public function pc(Request $request, $suffix = null)
+    {
+        $server_name = $_SERVER['HTTP_HOST'];
+        $landing = PcLanding::where('domain', $server_name)->first();
+
+        if ($suffix) {
+            $landing = PcLanding::where([
+                'domain' => $server_name,
+                'domain_suffix' => $suffix
+            ])->first();
+        }
+        if (!$landing) {
+            exit('未找到对应的落地页,请检查链接是否有误');
+        }
+        $template = Template::find($landing->template_id);
+//        dd($template->template);
+        $request->setTrustedProxies($request->getClientIps());
+        $ip = $request->getClientIp();
+        return view('pc.' . $template->template, [
+            'landing' => $landing,
+            'ip' => $ip,
         ]);
     }
 

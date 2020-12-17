@@ -14,4 +14,5 @@
 //Route::get('/{slug}', 'IndexController@index')->name('index');
 //Route::get('/', 'IndexController@baidu')->name('baidu');
 //Route::get('/toutiao/{id}', 'IndexController@toutiao');
+Route::get('/pc/{suffix?}', 'IndexController@pc')->name('pc');
 Route::get('/{suffix?}', 'IndexController@template')->name('template');
