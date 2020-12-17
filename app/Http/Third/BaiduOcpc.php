@@ -22,7 +22,7 @@ class BaiduOcpc
     public function sendConvertData($token, $conversionTypes) {
         $reqData = array('token' => $token, 'conversionTypes' => $conversionTypes);
         //写入日志
-        $logger = new Logger('hsorders');
+        $logger = new Logger('baidu');
         $logger->pushHandler(new StreamHandler(storage_path('logs/baidu-' . date('Y-m-d') . '.log')));
         $logger->info('request:', $reqData);
         $reqData = json_encode($reqData);
