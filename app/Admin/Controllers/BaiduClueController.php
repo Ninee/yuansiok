@@ -83,9 +83,9 @@ class BaiduClueController extends Controller
 
         $grid->model()->orderBy('id', 'desc');
         $grid->id('Id');
-        $grid->name('转化名称');
+        $grid->name('账户名称');
         $grid->token('Token');
-        $grid->created_at('转化时间');
+        $grid->created_at('创建时间');
 
         return $grid;
     }
@@ -118,7 +118,7 @@ class BaiduClueController extends Controller
     {
         $form = new Form(new BaiduClue);
 
-        $form->text('name', '转化名称');
+        $form->text('name', '账户名称')->help('百度一个账户对应一个token');
         $form->text('token', 'Token');
 
         return $form;
