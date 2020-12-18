@@ -81,6 +81,7 @@ class BaiduClueController extends Controller
     {
         $grid = new Grid(new BaiduClue);
 
+        $grid->model()->orderBy('id', 'desc');
         $grid->id('Id');
         $grid->name('转化名称');
         $grid->token('Token');
