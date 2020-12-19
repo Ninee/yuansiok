@@ -36,6 +36,9 @@ class TestController extends Controller
         $logger->pushHandler(new StreamHandler(storage_path('logs/budan-' . date('Y-m-d') . '.log')));
         $logger->info('order:', $order);
         $new = WyUser::where('open_id', $order['open_id'])->where('is_back', 0)->first();
+        if (!$new) {
+            return response('订单已经回传过了');
+        }
         //如果是新用户，付费回传
         if ($new) {
             //只上传当天注册用户的订单数据
