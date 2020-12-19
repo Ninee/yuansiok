@@ -146,7 +146,7 @@ class ThirdController extends Controller
                         }
 
                         //查询落地页访问记录
-                        $visitor = Visitor::where('ip', $order['ip'])->orderBy('id', 'asc')->first();
+                        $visitor = Visitor::where('ip', $order['ip'])->where('created_at', '>', date('Y-m-d 00:00:00'))->orderBy('id', 'asc')->first();
                         if (!$visitor) {
                             $logger->warn('warn:', ['message' => '无对应访问记录']);
                             continue;
@@ -208,7 +208,7 @@ class ThirdController extends Controller
                     return response('ok-not valid reg date');
                 }
 
-                $visitor = Visitor::where('ip', $new['ip'])->orderBy('id', 'asc')->first();
+                $visitor = Visitor::where('ip', $new['ip'])->where('created_at', '>', date('Y-m-d 00:00:00'))->orderBy('id', 'asc')->first();
                 if (!$visitor) {
                     $logger->warn('warn:', ['message' => '无对应访问记录']);
                     return response('ok-not valid visitor');
