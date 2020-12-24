@@ -146,6 +146,7 @@ class TouTiaoController extends Controller
         $form->text('domain', '投放域名')->required();
         $form->text('domain_suffix', '域名后缀')->help('跑UC以及百度，必填，不然回传不正常。');
         $form->select('template_id', '模板')->options(Template::orderBy('id', 'desc')->pluck('name', 'id'));
+        $form->text('ucid', 'UCID');
         $form->text('title', '标题')->required();
         $form->UEditor('content', '内容')->required();
         $form->image('avatar', '公众号头像')->uniqueName();

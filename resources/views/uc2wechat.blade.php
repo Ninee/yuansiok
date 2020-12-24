@@ -234,7 +234,7 @@
   </script>
   <script>
    function one_click(){
-    utq('track', 'Other', '579513');
+    utq('track', 'Other', '{{$toutiao->ucid}}');
 
    }
   </script>
