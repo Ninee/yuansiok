@@ -48,14 +48,16 @@ class PostBackController extends Controller
     public function toutiao(Request $request)
     {
         $plan_id = $request->plan_id;
-        //查找最新一条有效访问数据
-        $visitor = Visitor::where('adid', $plan_id)->where('platform', Visitor::PLATFORM_TOUTIAO)->orderBy('id', 'desc')->first();
-        if (!$visitor) {
+        //查找最新10条最新访客记录，随机一条，预防取到无效回传链接
+        $visitors = Visitor::where('adid', $plan_id)->where('platform', Visitor::PLATFORM_TOUTIAO)->take(10)->get();
+        if (!$visitors) {
             return response()->json([
                 "code" => 500,
                 "message" => '还没有对应的真实访问记录'
             ]);
         }
+        $counter = $visitors->count();
+        $visitor = $visitors[rand(0, $counter - 1)];
         $ocpc = new \App\Http\Third\Toutiao();
         $ocpc->sendConvertData($visitor->url, 2);
         $page =  TouTiao::find($visitor->page_id);
