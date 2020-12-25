@@ -92,7 +92,7 @@ class RawController extends Controller
             $filter->disableIdFilter();
             $filter->like('name', '上传者');
         });
-        $grid->disableActions();
+//        $grid->disableActions();
 
         return $grid;
     }
