@@ -9,7 +9,7 @@ class RawController extends Controller
 {
     public function upload(Request $request)
     {
-        $has = Raw::where('img', $request->img)->where('title', $request->title)->first();
+        $has = Raw::where('imgs', json_encode($request->imgs))->where('title', $request->title)->first();
         if ($has) {
             return response()->json([
                 'code' => 10086,

@@ -15,8 +15,9 @@ class CreateRawsTable extends Migration
     {
         Schema::create('raws', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('img');
+            $table->text('imgs');
             $table->string('title');
+            $table->string('source');
             $table->timestamps();
         });
     }

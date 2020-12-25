@@ -83,9 +83,10 @@ class RawController extends Controller
 
         $grid->model()->orderBy('id', 'desc');
         $grid->id('Id');
-        $grid->img('图片')->image();
+        $grid->imgs('图片')->image();
         $grid->column('title', '文案');
         $grid->column('name', '上传者');
+        $grid->column('source', '来源');
         $grid->created_at('上传时间');
         $grid->filter(function ($filter) {
             $filter->disableIdFilter();
@@ -124,9 +125,10 @@ class RawController extends Controller
     {
         $form = new Form(new Raw);
 
-        $form->image('img', '图片');
+        $form->multipleImage('imgs', '图片');
         $form->text('title', '文案');
         $form->hidden('name', '上传者')->default('管理员');
+        $form->hidden('source', '来源')->default('后台');
         return $form;
     }
 }
