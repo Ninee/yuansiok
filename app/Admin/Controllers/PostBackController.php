@@ -83,7 +83,7 @@ class PostBackController extends Controller
 
                 break;
             case PostBack::BOOK_PLATFORM_WY:
-                $sql = "SELECT * FROM `visitors`, `wy_orders`, `wy_users` WHERE wy_orders.open_id = wy_users.open_id AND wy_users.ip = visitors.ip AND wy_users.is_back = 0 AND visitors.adid='$plan_id' GROUP BY visitors.ip";
+                $sql = "SELECT * FROM `visitors`, `wy_orders`, `wy_users` WHERE wy_orders.open_id = wy_users.open_id AND wy_users.ip = visitors.ip AND wy_users.is_back = 0 AND visitors.adid='$plan_id'";
                 break;
         }
         $result = DB::select($sql);

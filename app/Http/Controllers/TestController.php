@@ -91,6 +91,14 @@ class TestController extends Controller
         }
     }
 
+    public function budanById(Request $request)
+    {
+        $visitor = Visitor::find($request->id);
+        $toutiao = new \App\Http\Third\Toutiao();
+        $res = $toutiao->sendConvertData($visitor->url, 2);
+        print_r($res);
+    }
+
     public function testHs2Baidu()
     {
         $url = 'https://vip.rlcps.cn/api/orderList';
