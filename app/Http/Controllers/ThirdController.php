@@ -122,7 +122,7 @@ class ThirdController extends Controller
             $result = json_decode($response, true);
             //同步订单
             $orders = $result['data'];
-            print_r($orders);
+//            print_r($orders);
 
             foreach ($orders as $index => $order) {
                 //检查是否已入库
