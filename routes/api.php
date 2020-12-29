@@ -26,3 +26,4 @@ Route::get('/third/backforhs', 'ThirdController@back4Hs');
 Route::post('/third/wy/user', 'ThirdController@wyNewUser');
 Route::post('/third/wy/order', 'ThirdController@wyOrder');
 Route::post('/raw/upload', 'RawController@upload');
+Route::get('/schedule/clear_visitors', 'ScheduleController@clearVisitors');
