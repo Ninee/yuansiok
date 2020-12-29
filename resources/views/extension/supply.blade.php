@@ -19,20 +19,33 @@
         <div class="form-horizontal">
             <div class="form-group">
 
-                <label for="baidu" class="col-sm-2 asterisk control-label">计划id</label>
+                <label for="baidu" class="col-sm-2 asterisk control-label">计划id或订单号</label>
 
                 <div class="col-sm-8">
                     <div class="input-group">
 
                         <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
 
-                        <input required="1" type="text" id="toutiao_plan" name="toutiao_plan" value="" class="form-control" placeholder="输入计划id">
+                        <input required="1" type="text" id="toutiao_plan" name="toutiao_plan" value="" class="form-control" placeholder="输入计划id或者订单号">
 
                     </div>
 
                 </div>
             </div>
-            <div class="form-group  ">
+            <div class="form-group">
+                <label for="type" class="col-sm-2 asterisk control-label">类型</label>
+                <div class="col-sm-8">
+                    <div class="radio">
+                        <label class="radio-inline">
+                            <input type="radio" name="type" value="1" class="minimal" checked />&nbsp;计划id&nbsp;&nbsp;
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="type" value="2" class="minimal"/>&nbsp;订单号&nbsp;&nbsp;
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
 
                 <label for="back_rate" class="col-sm-2 asterisk control-label">书城</label>
 
@@ -48,6 +61,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-md-12">
                 <div class="col-md-2"></div>
                 <div class="col-md-8">
@@ -112,6 +126,7 @@
 
         $('#searchBtn').on('click', function () {
             var plan_id = $('#toutiao_plan').val()
+            var type = $("input[name='type']:checked").val();
             var book_platform = $("input[name='book_platform']:checked").val();
             $('#data').html('');
             $('#loading').show()
@@ -121,7 +136,8 @@
                 data: {
                     _token:LA.token,
                     book_platform: book_platform,
-                    plan_id: plan_id
+                    plan_id: plan_id,
+                    type: type
                 },
                 success: function (res) {
                     $('#loading').hide()

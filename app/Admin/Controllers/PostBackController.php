@@ -77,13 +77,18 @@ class PostBackController extends Controller
     {
         $plan_id = $request->plan_id;
         $book_platform = $request->book_platform;
+        $type = $request->type;
         $sql = '';
         switch ($book_platform) {
             case PostBack::BOOK_PLATFORM_HS:
 
                 break;
             case PostBack::BOOK_PLATFORM_WY:
-                $sql = "SELECT * FROM `visitors`, `wy_orders`, `wy_users` WHERE wy_orders.open_id = wy_users.open_id AND wy_users.ip = visitors.ip AND wy_users.is_back = 0 AND visitors.adid='$plan_id'";
+                if ($type == 1) {
+                    $sql = "SELECT * FROM `visitors`, `wy_orders`, `wy_users` WHERE wy_orders.open_id = wy_users.open_id AND wy_users.ip = visitors.ip AND wy_users.is_back = 0 AND visitors.adid='$plan_id'";
+                } else {
+                    $sql = "SELECT * FROM `visitors`, `wy_orders`, `wy_users` WHERE wy_orders.open_id = wy_users.open_id AND wy_users.ip = visitors.ip AND `wy_orders`.order_id='$plan_id' GROUP BY `visitors`.adid";
+                }
                 break;
         }
         $result = DB::select($sql);
@@ -101,7 +106,8 @@ class PostBackController extends Controller
         $logger = new Logger('budan');
         $logger->pushHandler(new StreamHandler(storage_path('logs/budan-' . date('Y-m-d') . '.log')));
         $logger->info('order:', $order);
-        $new = WyUser::where('open_id', $order['open_id'])->where('is_back', 0)->first();
+//        $new = WyUser::where('open_id', $order['open_id'])->where('is_back', 0)->first();
+        $new = WyUser::where('open_id', $order['open_id'])->first();
         if (!$new) {
             return response()->json([
                 'code' => 500,
