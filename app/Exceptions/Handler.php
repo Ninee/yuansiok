@@ -3,7 +3,9 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 
 class Handler extends ExceptionHandler
 {
@@ -48,6 +50,20 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceof ValidationException){
+            $string = [];
+            foreach ( $exception->errors() as $key => $value) {
+                $string[] = $key . ':' . $value[0];
+            }
+            return response()->json([
+                'msg' => implode(',', $string),
+                'code' => 422,
+            ]);
+        }
+        if ($exception instanceof AuthenticationException){
+            return response('未授权', 401);
+        }
+
         return parent::render($request, $exception);
     }
 }

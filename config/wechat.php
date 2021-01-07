@@ -77,6 +77,12 @@ return [
             //     'enforce_https' => true,
             // ],
         ],
+        'quwen' => [
+            'app_id'  => 'wx5f322836e6553d03',         // AppID
+            'secret'  => 'a4ec512eb31c308cd13983c7f270eb40',    // AppSecret
+            'token'   => '',           // Token
+            'aes_key' => '',                 // EncodingAESKey
+        ]
     ],
 
     /*

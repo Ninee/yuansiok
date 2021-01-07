@@ -27,3 +27,20 @@ Route::post('/third/wy/user', 'ThirdController@wyNewUser');
 Route::post('/third/wy/order', 'ThirdController@wyOrder');
 Route::post('/raw/upload', 'RawController@upload');
 Route::get('/schedule/clear_visitors', 'ScheduleController@clearVisitors');
+Route::get('/fans', 'TestController@fans');
+
+Route::group([
+    'middleware' => 'api',
+    'namespace' => 'Api',
+], function ($router) {
+    Route::post('auth/login', 'AuthController@login')->name('login');
+});
+
+Route::group([
+    'middleware' => 'auth:api',
+    'namespace' => 'Api',
+], function ($router) {
+    Route::get('landing/list', 'LandingController@list');
+    Route::get('landing/randWord', 'LandingController@randWord');
+    Route::post('landing/updateWord', 'LandingController@updateWords');
+});

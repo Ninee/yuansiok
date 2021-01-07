@@ -178,4 +178,16 @@ class TestController extends Controller
         }
         curl_close($ch);
     }
+
+    public function fans()
+    {
+        $mp = \EasyWeChat::officialAccount('quwen');
+        $fans = $mp->user->list();
+        $file = fopen(storage_path('quwen'. date('Y-m-d H:i:s') . '.txt'), 'a');
+        foreach ($fans['data']['openid'] as $openid) {
+            fwrite($file, $openid . "\r\n");
+        }
+        fclose($file);
+        dd($fans);
+    }
 }

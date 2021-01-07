@@ -42,8 +42,8 @@ return [
         ],
 
         'api' => [
-            'driver' => 'token',
-            'provider' => 'users',
+            'driver' => 'jwt',
+            'provider' => 'wx_users',
         ],
     ],
 
@@ -68,6 +68,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\User::class,
+        ],
+        'wx_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\WxUser::class,
         ],
 
         // 'users' => [

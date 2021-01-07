@@ -16,6 +16,8 @@
         "maatwebsite/excel": "^3.1",
         "overtrue/laravel-wechat": "^5.1",
         "overtrue/pinyin": "^4.0",
+        "symfony/event-dispatcher": "4.3",
+        "tymon/jwt-auth": "^1.0",
         "zgldh/qiniu-laravel-storage": "^0.10.3"
     },
     "require-dev": {
@@ -32,7 +34,10 @@
         ],
         "psr-4": {
             "App\\": "app/"
-        }
+        },
+        "files": [
+            "app/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -65,7 +70,7 @@
     "repositories": {
         "packagist": {
             "type": "composer",
-            "url": "https://packagist.phpcomposer.com"
+            "url": "https://mirrors.aliyun.com/composer/"
         }
     }
 }
