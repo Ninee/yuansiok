@@ -29,11 +29,12 @@ class LandingController extends Controller
         for ($i = 0; $i < 5; $i ++) {
             $one = random_int(0, $count - 1);
             $two = random_int(0, $count - 1);
+            $three = random_int(0, $count - 1);
             if ($two == $one) {
                 $two = random_int(0, $count - 1);
             }
 
-            array_push($arr, ['word' => $words[$one] . $words[$two]]);
+            array_push($arr, ['word' => $words[$one] . $words[$two] . $words[$three]]);
         }
 
         return json_response(($arr));
