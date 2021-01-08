@@ -17,7 +17,7 @@ class LandingController extends Controller
             return $query->where('remark', 'like', '%'.$keyword.'%');
         })
             ->orderBy('id', 'desc')
-            ->paginate(25);
+            ->paginate(30);
         return json_response($landings);
     }
 
