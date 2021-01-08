@@ -10,6 +10,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Support\MessageBag;
 
 class RandWordController extends Controller
 {
@@ -81,6 +82,7 @@ class RandWordController extends Controller
     protected function grid()
     {
         $grid = new Grid(new RandWord);
+        $grid->model()->orderBy('id', 'desc');
 
 //        $grid->id('Id');
         $grid->word('词语');
@@ -127,8 +129,35 @@ class RandWordController extends Controller
     {
         $form = new Form(new RandWord);
 
-        $form->text('word', '词语');
+        $form->textarea('word', '词语')->help('输入多个词语，一个词一行');
         $form->hidden('user_id', '贡献者')->default(Admin::user()->id);
+        $form->saving(function ($form) {
+            $words = explode("\r\n", $form->word);
+            $had = [];
+            //查重
+            foreach ($words as $word) {
+                $repeat = RandWord::where('word', $word)->first();
+                if ($repeat) {
+                    array_push($had, $word);
+                }
+            }
+            if (!empty($had)) {
+                $error = new MessageBag([
+                    'title'   => '错误',
+                    'message' => '词库中已有词汇：' . implode('、', $had),
+                ]);
+
+                return back()->with(compact('error'));
+            } else {
+                foreach ($words as $word) {
+                    RandWord::create([
+                        'word' => $word,
+                        'user_id' => $form->user_id
+                    ]);
+                }
+                return redirect('/admin/rand_words');
+            }
+        });
 
         return $form;
     }
