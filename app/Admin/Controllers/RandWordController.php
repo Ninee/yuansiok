@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Models\RandWord;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -23,8 +24,8 @@ class RandWordController extends Controller
     public function index(Content $content)
     {
         return $content
-            ->header('Index')
-            ->description('description')
+            ->header('随机词')
+            ->description('')
             ->body($this->grid());
     }
 
@@ -81,8 +82,9 @@ class RandWordController extends Controller
     {
         $grid = new Grid(new RandWord);
 
-        $grid->id('Id');
+//        $grid->id('Id');
         $grid->word('词语');
+        $grid->column('user.username', '贡献者');
 
         $grid->actions(function ($actions) {
 
@@ -126,6 +128,7 @@ class RandWordController extends Controller
         $form = new Form(new RandWord);
 
         $form->text('word', '词语');
+        $form->hidden('user_id', '贡献者')->default(Admin::user()->id);
 
         return $form;
     }
