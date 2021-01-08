@@ -44,7 +44,7 @@ class HomeController extends Controller
                 $row->column(4, function (Column $column) {
                     $column->append(PostBack::home());
                 });
-                $row->column(6, function (Column $column) {
+                $row->column(8, function (Column $column) {
                     $grid = new Grid(new VirtualBackRecord);
                     $grid->header(function () {
                        return '操作记录';
