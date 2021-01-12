@@ -6,15 +6,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Third\BaiduOcpc;
 use App\Http\Third\UcOcpc;
+use App\Http\Util\HttpClient;
 use App\Models\HsOrder;
 use App\Models\HuaSheng;
 use App\Models\Visitor;
 use App\Models\WyOrder;
 use App\Models\WyUser;
+use App\Models\YcOrder;
 use App\TouTiao;
 use Illuminate\Http\Request;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use function GuzzleHttp\Psr7\build_query;
 
 class ThirdController extends Controller
 {
@@ -81,6 +84,104 @@ class ThirdController extends Controller
         }
 
     }
+
+    public function ycSign($data)
+    {
+        $secret = '3YoRBAB3ygVZM2I8BlZoS0qur5i47lVe';
+        $req = $data;
+//        ksort($req, SORT_REGULAR);
+        asort($req);
+        $splicedString = '';
+        foreach ($req as $paramKey => $paramValue) {
+            $splicedString .= $paramKey . trim($paramValue);
+        }
+        return md5($splicedString . $secret);
+    }
+    /**
+     * 元初回传
+     */
+    public function back4Yc()
+    {
+        //请求渠道列表
+        $appid = 13;
+        $data = [
+            'appid' => $appid,
+            'timesmap' => time()
+        ];
+        $data['sign'] = $this->ycSign($data);
+        $client = new HttpClient('https://vip.yuyuetui.net/index/api/getChannelList');
+        $request = $client->httpGet('', $data);
+        $response = $this->response($request);
+        if ($response['code'] == 0) {
+            $channels = $response['data'];
+            foreach ($channels as $channel) {
+                $orderReq = [
+                    'appid' => $appid,
+                    'timesmap' => time(),
+                    'channel' => $channel['channel'],
+                    'starttime' => strtotime(date('Y-m-d 00:00:00', time())),
+                    'endtime' => strtotime(date('Y-m-d 23:59:59', time())),
+                    'status' => 1,
+                    'page' => 1
+                ];
+
+                $orderReq['sign'] = $this->ycSign($orderReq);
+                $orderClient = new HttpClient('https://vip.yuyuetui.net/index/api/getOrderList');
+                $orderResult = $this->response($orderClient->httpGet('', $orderReq));
+                if ($orderResult['code'] == 0) {
+                    if ($orderResult['data']['item']) {
+
+                        //插入数据并回传
+                        $orders = $orderResult['data']['item'];
+                        foreach ($orders as $index => $order) {
+                            //检查是否已入库
+                            $exist = YcOrder::where('order_id', $order['order_id'])->first();
+                            if (!$exist) {
+                                //如果是首冲，付费回传
+                                if ($order['status'] == 1) {
+                                    //写入日志
+                                    $logger = new Logger('ycorders');
+                                    $logger->pushHandler(new StreamHandler(storage_path('logs/yc_orders-' . date('Y-m-d') . '.log')));
+                                    $logger->info('order:', $order);
+
+                                    $ycOrder = YcOrder::create($order);
+
+                                    //只上传当天注册用户的订单数据
+                                    $subscribe = date('Y-m-d', strtotime($order['regsiter_time']));
+                                    if ($subscribe != date('Y-m-d')) {
+                                        $logger->warn('warn:', ['message' => '非当天注册用户']);
+                                        continue;
+                                    }
+
+                                    //查询落地页访问记录
+                                    $visitor = Visitor::where('ip', $order['ip'])->where('created_at', '>', date('Y-m-d 00:00:00'))->orderBy('id', 'asc')->first();
+                                    if (!$visitor) {
+                                        $logger->warn('warn:', ['message' => '无对应访问记录']);
+                                        continue;
+                                    }
+
+                                    //回传
+                                    $res = $this->postBack($visitor, $order['money']);
+                                    //回传成功，更新订单回传状态
+                                    if ($res) {
+                                        $ycOrder->is_back = 1;
+                                        $ycOrder->save();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    public function response($res)
+    {
+        return json_decode($res->getBody()->getContents(), true);
+    }
+
 
     public function hs2Back($merchant_id)
     {
