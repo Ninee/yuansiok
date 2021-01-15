@@ -8,6 +8,7 @@ use App\Admin\Extension\PostBack;
 use App\Http\Controllers\Controller;
 use App\Http\Third\BaiduOcpc;
 use App\Imports\PostBackImport;
+use App\Models\HsOrder;
 use App\Models\VirtualBackRecord;
 use App\Models\Visitor;
 use App\Models\WyOrder;
@@ -82,7 +83,11 @@ class PostBackController extends Controller
         $sql = '';
         switch ($book_platform) {
             case PostBack::BOOK_PLATFORM_HS:
-
+                if ($type == 1) {
+                    $sql = "SELECT * FROM `visitors`, `hs_orders` WHERE hs_orders.ip = visitors.ip AND visitors.adid='$plan_id'";
+                } else {
+                    $sql = "SELECT * FROM `visitors`, `hs_orders` WHERE hs_orders.ip = visitors.ip AND `hs_orders`.order_num='$plan_id' GROUP BY `visitors`.adid";
+                }
                 break;
             case PostBack::BOOK_PLATFORM_WY:
                 if ($type == 1) {
@@ -93,7 +98,7 @@ class PostBackController extends Controller
                 break;
             case PostBack::BOOK_PLATFORM_YC:
                 if ($type == 1) {
-                    $sql = "SELECT * FROM `visitors`, `yc_orders` WHERE yc_orders.ip = visitors.ip AND wy_users.is_back = 0 AND visitors.adid='$plan_id'";
+                    $sql = "SELECT * FROM `visitors`, `yc_orders` WHERE yc_orders.ip = visitors.ip AND visitors.adid='$plan_id'";
                 } else {
                     $sql = "SELECT * FROM `visitors`, `yc_orders` WHERE yc_orders.ip = visitors.ip AND `yc_orders`.order_id='$plan_id' GROUP BY `visitors`.adid";
                 }
@@ -104,9 +109,16 @@ class PostBackController extends Controller
         //格式统一
         if ($book_platform == PostBack::BOOK_PLATFORM_YC) {
             foreach ($supplies as $index => $supply) {
-                $supplies[$index]['amount'] = $supplies[$index]['money'] * 100;
+                $supplies[$index]['amount'] = $supplies[$index]['amount'] * 100;
                 $supplies[$index]['order_time'] = date('Y-m-d H:i:s', $supplies[$index]['pay_time']);
                 $supplies[$index]['reg_time'] = date('Y-m-d H:i:s', $supplies[$index]['regsiter_time']);
+            }
+        }
+        if ($book_platform == PostBack::BOOK_PLATFORM_YC) {
+            foreach ($supplies as $index => $supply) {
+                $supplies[$index]['amount'] = $supplies[$index]['money'] * 100;
+                $supplies[$index]['order_time'] = $supplies[$index]['pay_at'];
+                $supplies[$index]['reg_time'] = $supplies[$index]['subscribe_at'];
             }
         }
 
@@ -122,6 +134,10 @@ class PostBackController extends Controller
         $order_sn = $request->order;
         $book_platform = $request->book_platform;
         switch ($book_platform) {
+            case PostBack::BOOK_PLATFORM_HS:
+                $order = HsOrder::where('order_num', $order_sn)->first()->toArray();
+                $visitor = Visitor::where('ip', $order['ip'])->where('adid', $request->adid)->first();
+                break;
             case PostBack::BOOK_PLATFORM_WY:
                 $order = WyOrder::where('order_id', $order_sn)->first()->toArray();
 

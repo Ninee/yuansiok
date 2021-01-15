@@ -52,14 +52,14 @@
                 <div class="col-sm-8">
                     <div class="radio">
                         <label class="radio-inline">
-                            <input type="radio" name="book_platform" value="2" class="minimal" checked />&nbsp;网易文鼎&nbsp;&nbsp;
+                            <input type="radio" name="book_platform" value="1" class="minimal" checked/>&nbsp;花生&nbsp;&nbsp;
                         </label>
                         <label class="radio-inline">
-                            <input type="radio" name="book_platform" value="3" class="minimal" checked />&nbsp;元初&nbsp;&nbsp;
+                            <input type="radio" name="book_platform" value="2" class="minimal"/>&nbsp;网易文鼎&nbsp;&nbsp;
                         </label>
-{{--                        <label class="radio-inline">--}}
-{{--                            <input type="radio" name="book_platform" value="1" class="minimal"/>&nbsp;花生&nbsp;&nbsp;--}}
-{{--                        </label>--}}
+                        <label class="radio-inline">
+                            <input type="radio" name="book_platform" value="3" class="minimal"/>&nbsp;元初&nbsp;&nbsp;
+                        </label>
 
                     </div>
                 </div>
