@@ -105,8 +105,8 @@ class PostBackController extends Controller
         if ($book_platform == PostBack::BOOK_PLATFORM_YC) {
             foreach ($supplies as $index => $supply) {
                 $supplies[$index]['amount'] = $supplies[$index]['money'] * 100;
-                $supplies[$index]['order_time'] = $supplies[$index]['pay_time'];
-                $supplies[$index]['reg_time'] = $supplies[$index]['regsiter_time'];
+                $supplies[$index]['order_time'] = date('Y-m-d H:i:s', $supplies[$index]['pay_time']);
+                $supplies[$index]['reg_time'] = date('Y-m-d H:i:s', $supplies[$index]['regsiter_time']);
             }
         }
 
