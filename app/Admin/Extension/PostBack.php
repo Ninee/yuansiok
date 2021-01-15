@@ -10,6 +10,7 @@ class PostBack
 {
     const BOOK_PLATFORM_HS = 1;
     const BOOK_PLATFORM_WY = 2;
+    const BOOK_PLATFORM_YC = 3;
 
     public static function home()
     {

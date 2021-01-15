@@ -90,6 +90,13 @@ class PostBackController extends Controller
                     $sql = "SELECT * FROM `visitors`, `wy_orders`, `wy_users` WHERE wy_orders.open_id = wy_users.open_id AND wy_users.ip = visitors.ip AND `wy_orders`.order_id='$plan_id' GROUP BY `visitors`.adid";
                 }
                 break;
+            case PostBack::BOOK_PLATFORM_YC:
+                if ($type == 1) {
+                    $sql = "SELECT * FROM `visitors`, `yc_orders` WHERE yc_orders.ip = visitors.ip AND wy_users.is_back = 0 AND visitors.adid='$plan_id'";
+                } else {
+                    $sql = "SELECT * FROM `visitors`, `yc_orders` WHERE yc_orders.ip = visitors.ip AND `yc_orders`.order_id='$plan_id' GROUP BY `visitors`.adid";
+                }
+                break;
         }
         $result = DB::select($sql);
         return response()->json([
