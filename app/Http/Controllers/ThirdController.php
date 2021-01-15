@@ -147,7 +147,7 @@ class ThirdController extends Controller
                                     $ycOrder = YcOrder::create($order);
 
                                     //只上传当天注册用户的订单数据
-                                    $subscribe = date('Y-m-d', strtotime($order['regsiter_time']));
+                                    $subscribe = date('Y-m-d', $order['regsiter_time']);
                                     if ($subscribe != date('Y-m-d')) {
                                         $logger->warn('warn:', ['message' => '非当天注册用户']);
                                         continue;
@@ -161,7 +161,7 @@ class ThirdController extends Controller
                                     }
 
                                     //回传
-                                    $res = $this->postBack($visitor, $order['money']);
+                                    $res = $this->postBack($visitor, $order['money'] * 100);
                                     //回传成功，更新订单回传状态
                                     if ($res) {
                                         $ycOrder->is_back = 1;

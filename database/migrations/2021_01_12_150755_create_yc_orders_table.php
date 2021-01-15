@@ -25,7 +25,7 @@ class CreateYcOrdersTable extends Migration
             $table->string('book_name');
             $table->string('regsiter_time')->nullable();
             $table->string('ip');
-            $table->string('ua')->nullable();
+            $table->text('ua')->nullable();
             $table->string('open_id')->nullable();
             $table->string('nickname')->nullable();
             $table->tinyInteger('is_back')->default(0);
