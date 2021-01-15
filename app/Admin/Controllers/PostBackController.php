@@ -12,6 +12,7 @@ use App\Models\VirtualBackRecord;
 use App\Models\Visitor;
 use App\Models\WyOrder;
 use App\Models\WyUser;
+use App\Models\YcOrder;
 use App\TouTiao;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -99,8 +100,18 @@ class PostBackController extends Controller
                 break;
         }
         $result = DB::select($sql);
+        $supplies = array_map('get_object_vars', $result);
+        //格式统一
+        if ($book_platform == PostBack::BOOK_PLATFORM_YC) {
+            foreach ($supplies as $index => $supply) {
+                $supplies[$index]['amount'] = $supplies[$index]['money'] * 100;
+                $supplies[$index]['order_time'] = $supplies[$index]['pay_time'];
+                $supplies[$index]['reg_time'] = $supplies[$index]['regsiter_time'];
+            }
+        }
+
         return response()->json([
-            'data' => $result,
+            'data' => $supplies,
             'code' => 0,
             'message' => ''
         ]);
@@ -109,63 +120,67 @@ class PostBackController extends Controller
     public function supply(Request $request)
     {
         $order_sn = $request->order;
-        $order = WyOrder::where('order_id', $order_sn)->first()->toArray();
+        $book_platform = $request->book_platform;
+        switch ($book_platform) {
+            case PostBack::BOOK_PLATFORM_WY:
+                $order = WyOrder::where('order_id', $order_sn)->first()->toArray();
+
+//        $new = WyUser::where('open_id', $order['open_id'])->where('is_back', 0)->first();
+                $new = WyUser::where('open_id', $order['open_id'])->first();
+                if (!$new) {
+                    return response()->json([
+                        'code' => 500,
+                        'message' => '订单已回传过'
+                    ]);
+                }
+                //如果是新用户，付费回传
+                $visitor = Visitor::where('ip', $new['ip'])->where('adid', $request->adid)->first();
+
+                break;
+            case PostBack::BOOK_PLATFORM_YC:
+                $order = YcOrder::where('order_id', $order_sn)->first()->toArray();
+                $visitor = Visitor::where('ip', $order['ip'])->where('adid', $request->adid)->first();
+                break;
+        }
         $logger = new Logger('budan');
         $logger->pushHandler(new StreamHandler(storage_path('logs/budan-' . date('Y-m-d') . '.log')));
         $logger->info('order:', $order);
-//        $new = WyUser::where('open_id', $order['open_id'])->where('is_back', 0)->first();
-        $new = WyUser::where('open_id', $order['open_id'])->first();
-        if (!$new) {
+        if (!$visitor) {
             return response()->json([
                 'code' => 500,
-                'message' => '订单已回传过'
+                'message' => '未找到对应IP的访客记录'
             ]);
         }
-        //如果是新用户，付费回传
-        if ($new) {
-            $visitor = Visitor::where('ip', $new['ip'])->where('adid', $request->adid)->first();
-            if (!$visitor) {
-                return response()->json([
-                    'code' => 500,
-                    'message' => '未找到对应IP的访客记录'
-                ]);
-            }
 
-            $page = TouTiao::find($visitor->page_id);
+        $page = TouTiao::find($visitor->page_id);
 
-            if ($visitor) {
-                switch ($visitor->platform) {
-                    //回传百度
-                    case Visitor::PLATFORM_BAIDU:
-                        $token = $page->baidu_clue;
-                        $cv = array(
-                            'logidUrl' => $visitor->url, // 您的落地页url
-                            'newType' => 19 // 转化类型请按实际情况填写
-                        );
-                        $conversionTypes = array($cv);
-                        $ocpc = new BaiduOcpc();
-                        $res = $ocpc->sendConvertData($token, $conversionTypes);
-                        break;
-                    //回传头条
-                    case Visitor::PLATFORM_TOUTIAO:
+        if ($visitor) {
+            switch ($visitor->platform) {
+                //回传百度
+                case Visitor::PLATFORM_BAIDU:
+                    $token = $page->baidu_clue;
+                    $cv = array(
+                        'logidUrl' => $visitor->url, // 您的落地页url
+                        'newType' => 19 // 转化类型请按实际情况填写
+                    );
+                    $conversionTypes = array($cv);
+                    $ocpc = new BaiduOcpc();
+                    $res = $ocpc->sendConvertData($token, $conversionTypes);
+                    break;
+                //回传头条
+                case Visitor::PLATFORM_TOUTIAO:
 //                        if ($order['amount'] >= (30 * 100) ) {
 //                            $toutiao = new \App\Http\Third\Toutiao();
 //                            $res = $toutiao->sendConvertData($visitor->url, 2);
 //                        } else {
 //                            $res = false;
 //                        }
-                        $toutiao = new \App\Http\Third\Toutiao();
-                        $res = $toutiao->sendConvertData($visitor->url, 2);
-                        break;
-                    default:
-                        $res = false;
-                        break;
-                }
-                //回传成功，更新订单回传状态
-                if ($res) {
-                    $new->is_back = 1;
-                    $new->save();
-                }
+                    $toutiao = new \App\Http\Third\Toutiao();
+                    $res = $toutiao->sendConvertData($visitor->url, 2);
+                    break;
+                default:
+                    $res = false;
+                    break;
             }
         }
         return response()->json([
