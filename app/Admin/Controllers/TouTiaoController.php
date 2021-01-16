@@ -3,9 +3,11 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Action\PageCopy;
+use App\Admin\Action\ReBack;
 use App\Models\BaiduClue;
 use App\Models\Mp;
 use App\Models\Template;
+use App\Models\Visitor;
 use App\TouTiao;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -108,6 +110,9 @@ class TouTiaoController extends Controller
             // 去掉查看
             $actions->disableView();
             $actions->append(new PageCopy($actions->getKey()));
+            if ($actions->row->baidu_clue) {
+                $actions->append(new ReBack($actions->getKey()));
+            }
         });
         return $grid;
     }
@@ -165,6 +170,16 @@ class TouTiaoController extends Controller
     {
         $id = $request->id;
         TouTiao::find($id)->replicate()->save();
+        return response()->json([
+            "code" => 0,
+            "message" => ''
+        ]);
+    }
+
+    public function reback(Request $request)
+    {
+        $id = $request->id;
+        Visitor::where('page_id', $id)->where('platform', Visitor::PLATFORM_BAIDU)->delete();
         return response()->json([
             "code" => 0,
             "message" => ''

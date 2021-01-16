@@ -19,6 +19,7 @@ Route::group([
     $router->resource('/landing', 'LandingController');
     $router->resource('/pc_landing', 'PcLandingController');
     $router->post('/page/copy', 'TouTiaoController@copy');
+    $router->post('/baidu/reback', 'TouTiaoController@reback');
     $router->resource('/toutiao', 'TouTiaoController');
     $router->resource('/mps', 'MpController');
     $router->resource('/huasheng', 'HuaShengController');
