@@ -141,22 +141,31 @@ class RandWordController extends Controller
                     array_push($had, $word);
                 }
             }
-            if (!empty($had)) {
-                $error = new MessageBag([
-                    'title'   => '错误',
-                    'message' => '词库中已有词汇：' . implode('、', $had),
+            //剔除已有词
+            $result = array_diff($words, $had);
+            foreach ($result as $word) {
+                RandWord::create([
+                    'word' => $word,
+                    'user_id' => $form->user_id
                 ]);
-
-                return back()->with(compact('error'));
-            } else {
-                foreach ($words as $word) {
-                    RandWord::create([
-                        'word' => $word,
-                        'user_id' => $form->user_id
-                    ]);
-                }
-                return redirect('/admin/rand_words');
             }
+            return redirect('/admin/rand_words');
+//            if (!empty($had)) {
+//                $error = new MessageBag([
+//                    'title'   => '错误',
+//                    'message' => '词库中已有词汇：' . implode('、', $had),
+//                ]);
+//
+//                return back()->with(compact('error'));
+//            } else {
+//                foreach ($words as $word) {
+//                    RandWord::create([
+//                        'word' => $word,
+//                        'user_id' => $form->user_id
+//                    ]);
+//                }
+//                return redirect('/admin/rand_words');
+//            }
         });
 
         return $form;
