@@ -24,6 +24,7 @@ Route::post('/visitor/save', 'VisitorController@save');
 Route::post('/baidu/debug', 'BaiduController@debug');
 Route::get('/third/backforhs', 'ThirdController@back4Hs');
 Route::get('/third/backforyc', 'ThirdController@back4Yc');
+Route::get('/third/backforzd', 'ThirdController@back4Zd');
 Route::post('/third/wy/user', 'ThirdController@wyNewUser');
 Route::post('/third/wy/order', 'ThirdController@wyOrder');
 Route::post('/raw/upload', 'RawController@upload');

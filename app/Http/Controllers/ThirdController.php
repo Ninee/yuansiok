@@ -13,6 +13,9 @@ use App\Models\Visitor;
 use App\Models\WyOrder;
 use App\Models\WyUser;
 use App\Models\YcOrder;
+use App\Models\ZdOrder;
+use App\Models\ZdUser;
+use App\Models\Zhangdu;
 use App\TouTiao;
 use Illuminate\Http\Request;
 use Monolog\Handler\StreamHandler;
@@ -324,5 +327,100 @@ class ThirdController extends Controller
             }
         }
         return response('ok');
+    }
+
+    /**
+     * 从掌读获取订单
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
+    public function back4Zd()
+    {
+        $startTime = \request('start_time') ? strtotime(date('Y-m-d 00:00:00', strtotime(\request('start_time')))): strtotime(date('Y-m-d 00:00:00',time()));
+        $endTime = \request('end_time') ? strtotime(date('Y-m-d 23:59:59', strtotime(\request('end_time')))) : time();
+
+        $api = 'https://api.zhangdu520.com/';
+        $client = new HttpClient($api);
+
+        $zhangdus = Zhangdu::all();
+        foreach ($zhangdus as $zhangdu) {
+            $uid = $zhangdu->uid;
+            $appSecret = $zhangdu->secret;
+            $timestamp = time();
+            $config = [
+                'uid' => $uid,
+                'timestamp' => $timestamp,
+                'sign' => md5($uid . '&' . $appSecret . '&' . $timestamp)
+            ];
+
+
+
+            $param = array_merge($config, [
+                'starttime' => $startTime,
+                'endtime' => $endTime,
+                'page' => 1,
+            ]) ;
+            //先请求新注册用户
+            $request = $client->httpGet('channel/getuser', $param);
+            $response = $this->httpResponse($request);
+            $users = $response['data']['list'];
+
+            foreach ($users as $user) {
+                ZdUser::firstOrCreate(['openid' => $user['openid']], $user);
+            }
+
+            //请求订单
+            $request = $client->httpGet('channel/getorder', $param);
+            $response = $this->httpResponse($request);
+            if ($response['err'] == 0) {
+                $orders = $response['data']['list'];
+                if (!empty($orders)) {
+                    foreach ($orders as $order) {
+                        //检查是否已入库
+                        $exist = ZdOrder::where('orderno', $order['orderno'])->first();
+                        if (!$exist) {
+                            //如果是首冲，付费回传
+                            $new = ZdUser::where('openid', $order['openid'])->where('is_back', 0)->whereBetween('regtime', [
+                                $startTime,
+                                $endTime
+                            ])->first();
+
+                            if ($new && $order['status'] == 1) {
+                                //写入日志
+                                $logger = new Logger('zdorders');
+                                $logger->pushHandler(new StreamHandler(storage_path('logs/zd_orders-' . date('Y-m-d') . '.log')));
+                                $logger->info('order:', $order);
+
+                                $zdOrder = ZdOrder::create($order);
+
+                                //查询落地页访问记录
+                                $visitor = Visitor::where('ip', $order['ip'])->where('created_at', '>', date('Y-m-d 00:00:00'))->orderBy('id', 'asc')->first();
+                                if (!$visitor) {
+                                    $logger->warn('warn:', ['message' => '无对应访问记录']);
+                                    continue;
+                                }
+                                //回传
+                                $res = $this->postBack($visitor, $order['amount'] * 100);
+                                //回传成功，更新订单回传状态
+                                if ($res) {
+                                    $new->is_back = 1;
+                                    $new->save();
+                                    $zdOrder->is_back = 1;
+                                    $zdOrder->save();
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                var_dump($response);
+            }
+        }
+        return response('掌读回传完成');
+    }
+
+    public function httpResponse($res)
+    {
+        return json_decode($res->getBody()->getContents(), true);
     }
 }

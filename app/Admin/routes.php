@@ -28,6 +28,7 @@ Route::group([
     $router->resource('/visitors', 'VisitorController');
     $router->resource('/raws', 'RawController');
     $router->resource('/rand_words', 'RandWordController');
+    $router->resource('/zhangdus', 'ZhangduController');
     $router->post('/api/post_back/baidu', 'PostBackController@baidu');
     $router->post('/api/post_back/toutiao', 'PostBackController@toutiao');
     $router->get('/api/get_supply', 'PostBackController@getSupplyList');
