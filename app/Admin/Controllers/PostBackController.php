@@ -60,8 +60,6 @@ class PostBackController extends Controller
         }
         $counter = $visitors->count();
         $visitor = $visitors[rand(0, $counter - 1)];
-        $ocpc = new \App\Http\Third\Toutiao();
-        $ocpc->sendConvertData($visitor->url, 2);
         $page =  TouTiao::find($visitor->page_id);
         VirtualBackRecord::create([
             'platform' => '头条',
@@ -69,6 +67,15 @@ class PostBackController extends Controller
             'page_remark' => $page->remark,
             'page_url' => $visitor->url
         ]);
+        if (!$page) {
+            return response()->json([
+                "code" => 500,
+                "message" => '未找到对应落地页'
+            ]);
+        }
+        $ocpc = new \App\Http\Third\Toutiao();
+        $ocpc->sendConvertData($visitor->url, 2);
+
         return response()->json([
             "code" => 0,
             "message" => ''
