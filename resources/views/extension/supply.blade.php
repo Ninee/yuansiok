@@ -74,10 +74,10 @@
                     <div class="btn-group pull-left">
                         <button id="searchBtn" type="button" class="btn btn-info submit btn-sm"><i class="fa fa-search"></i>&nbsp;&nbsp;搜索</button>
                     </div>
-                    <div class="btn-group pull-left " style="margin-left: 10px;">
-                        <button type="button" class="btn btn-primary btn-sm import-excel"><i class="fa fa-upload"></i>&nbsp;&nbsp;上传订单表格</button>
-                        <input style="display: none" name="orders" type="file" value="上传文件" id="file" />
-                    </div>
+{{--                    <div class="btn-group pull-left " style="margin-left: 10px;">--}}
+{{--                        <button type="button" class="btn btn-primary btn-sm import-excel"><i class="fa fa-upload"></i>&nbsp;&nbsp;上传订单表格</button>--}}
+{{--                        <input style="display: none" name="orders" type="file" value="上传文件" id="file" />--}}
+{{--                    </div>--}}
                 </div>
             </div>
 
