@@ -14,6 +14,8 @@ use App\Models\Visitor;
 use App\Models\WyOrder;
 use App\Models\WyUser;
 use App\Models\YcOrder;
+use App\Models\YwOrder;
+use App\Models\YwUser;
 use App\TouTiao;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -110,6 +112,13 @@ class PostBackController extends Controller
                     $sql = "SELECT * FROM `visitors`, `yc_orders` WHERE yc_orders.ip = visitors.ip AND `yc_orders`.order_id='$plan_id' GROUP BY `visitors`.adid";
                 }
                 break;
+            case PostBack::BOOK_PLATFORM_YW:
+                if ($type == 1) {
+                    $sql = "SELECT * FROM `visitors`, `yw_orders`, `yw_users` WHERE yw_orders.openid = yw_users.open_id AND yw_users.ip = visitors.ip AND yw_users.is_back = 0 AND visitors.adid='$plan_id'";
+                } else {
+                    $sql = "SELECT * FROM `visitors`, `yw_orders`, `yw_users` WHERE yw_orders.openid = yw_users.open_id AND yw_users.ip = visitors.ip AND `yw_orders`.order_id='$plan_id' GROUP BY `visitors`.adid";
+                }
+                break;
         }
         $result = DB::select($sql);
         $supplies = array_map('get_object_vars', $result);
@@ -127,6 +136,15 @@ class PostBackController extends Controller
                 $supplies[$index]['order_id'] = $supplies[$index]['order_num'];
                 $supplies[$index]['order_time'] = $supplies[$index]['pay_at'];
                 $supplies[$index]['reg_time'] = $supplies[$index]['subscribe_at'];
+            }
+        }
+
+        if ($book_platform == PostBack::BOOK_PLATFORM_YW) {
+            foreach ($supplies as $index => $supply) {
+                $supplies[$index]['amount'] = $supplies[$index]['amount'] * 100;
+                $supplies[$index]['order_id'] = $supplies[$index]['order_id'];
+                $supplies[$index]['order_time'] = $supplies[$index]['pay_time'];
+                $supplies[$index]['reg_time'] = $supplies[$index]['reg_time'];
             }
         }
 
@@ -164,6 +182,18 @@ class PostBackController extends Controller
             case PostBack::BOOK_PLATFORM_YC:
                 $order = YcOrder::where('order_id', $order_sn)->first()->toArray();
                 $visitor = Visitor::where('ip', $order['ip'])->where('adid', $request->adid)->first();
+                break;
+            case PostBack::BOOK_PLATFORM_YW:
+                $order = YwOrder::where('order_id', $order_sn)->first()->toArray();
+                $new = YwUser::where('open_id', $order['openid'])->first();
+                if (!$new) {
+                    return response()->json([
+                        'code' => 500,
+                        'message' => '订单已回传过'
+                    ]);
+                }
+                //如果是新用户，付费回传
+                $visitor = Visitor::where('ip', $new['ip'])->where('adid', $request->adid)->first();
                 break;
         }
         $logger = new Logger('budan');

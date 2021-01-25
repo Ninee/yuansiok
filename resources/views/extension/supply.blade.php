@@ -60,6 +60,9 @@
                         <label class="radio-inline">
                             <input type="radio" name="book_platform" value="3" class="minimal"/>&nbsp;元初&nbsp;&nbsp;
                         </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="book_platform" value="4" class="minimal"/>&nbsp;阅文&nbsp;&nbsp;
+                        </label>
 
                     </div>
                 </div>
