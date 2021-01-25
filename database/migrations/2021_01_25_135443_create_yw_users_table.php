@@ -15,8 +15,12 @@ class CreateYwUsersTable extends Migration
     {
         Schema::create('yw_users', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('platform');
+            $table->string('time');
+            $table->string('open_id');
+            $table->text('ua')->nullable();
+            $table->string('ip');
             $table->string('appflag');
-            $table->string('openid');
             $table->tinyInteger('is_back')->default(0);
             $table->timestamps();
         });

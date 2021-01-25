@@ -13,6 +13,8 @@ use App\Models\Visitor;
 use App\Models\WyOrder;
 use App\Models\WyUser;
 use App\Models\YcOrder;
+use App\Models\YwOrder;
+use App\Models\YwUser;
 use App\Models\ZdOrder;
 use App\Models\ZdUser;
 use App\Models\Zhangdu;
@@ -455,10 +457,38 @@ class ThirdController extends Controller
                 if ($orderResponse['code'] == 0) {
                     $orders = $orderResponse['data']['list'];
                     if (!empty($orders)) {
-                        dd($orders);
                         foreach ($orders as $order) {
                             //检查是否是首冲
+                            $exist = YwOrder::where('order_id', $order['order_id'])->first();
+                            if ($exist) continue;
+                            $logger = new Logger('ywOrder');
+                            $logger->pushHandler(new StreamHandler(storage_path('logs/yw_order-' . date('Y-m-d') . '.log')));
+                            $logger->info('order:', $order);
+                            YwOrder::create($order);
+                            $new = YwUser::where('open_id', $order['openid'])->where('is_back', 0)->first();
 
+                            //如果是新用户，付费回传
+                            if ($new) {
+                                //只上传当天注册用户的订单数据
+                                $reg_time = date('Y-m-d', strtotime($new->time));
+                                if ($reg_time != date('Y-m-d')) {
+                                    $logger->warn('warn:', ['message' => '非当天注册用户']);
+                                    continue;
+                                }
+
+                                $visitor = Visitor::where('ip', $new['ip'])->where('created_at', '>', date('Y-m-d 00:00:00'))->orderBy('id', 'asc')->first();
+                                if (!$visitor) {
+                                    $logger->warn('warn:', ['message' => '无对应访问记录']);
+                                    continue;
+                                }
+                                //回传
+                                $res = $this->postBack($visitor, $order['amount'] * 100);  //转换单位为分
+                                //回传成功，更新订单回传状态
+                                if ($res) {
+                                    $new->is_back = 1;
+                                    $new->save();
+                                }
+                            }
                         }
                     }
                 } else {
@@ -478,13 +508,13 @@ class ThirdController extends Controller
     public function ywNewUser(Request $request)
     {
         $user = $request->all();
-//        $exist = WyUser::where('open_id', $user['open_id'])->first();
-        $logger = new Logger('wyUser');
+        $exist = YwUser::where('open_id', $user['open_id'])->first();
+        $logger = new Logger('YwUser');
         $logger->pushHandler(new StreamHandler(storage_path('logs/yw_user-' . date('Y-m-d') . '.log')));
         $logger->info('user:', $user);
-//        if (!$exist) {
-//            WyUser::create($user);
-//        }
+        if (!$exist) {
+            YwUser::create($user);
+        }
         return response('ok');
     }
 

@@ -23,7 +23,6 @@ class CreateYwOrdersTable extends Migration
             $table->string('openid');
             $table->string('user_name');
             $table->string('reg_time');
-
             $table->timestamps();
         });
     }
