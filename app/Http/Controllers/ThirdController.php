@@ -419,6 +419,89 @@ class ThirdController extends Controller
         return response('掌读回传完成');
     }
 
+    public function back4Yw()
+    {
+        //阅文每次订单只支持截止到目前时间内订单
+        $api = 'https://open.yuewen.com/cpapi/';
+        $client = new HttpClient($api);
+        $config = [
+            'email' => '3035593319@qq.com',
+            'version' => 1,
+            'timestamp' => time(),
+        ];
+
+        $param = array_merge($config, [
+            'start_time' => strtotime('2019-01-01'),
+            'end_time' => time(),
+            'page' => 1,
+        ]) ;
+
+        $param['sign'] = $this->ywSign($param);
+        $request = $client->httpGet('wxRecharge/getapplist', $param);
+        $response = $this->httpResponse($request);
+        if ($response['code'] == 0) {
+            $channels = $response['data']['list'];
+            foreach ($channels as $channel) {
+                $data = array_merge($config, [
+                    'start_time' => strtotime(date('Y-m-d 00:00:00', time())),
+                    'end_time' => time() - 60,
+                    'appflags' => $channel['appflag'],
+                    'order_status' => 2,
+                ]);
+                $data['sign'] = $this->ywSign($data);
+                $orderReq = $client->httpGet('wxRecharge/querychargelog', $data);
+                $orderResponse = $this->httpResponse($orderReq);
+                unset($data);
+                if ($orderResponse['code'] == 0) {
+                    $orders = $orderResponse['data']['list'];
+                    if (!empty($orders)) {
+                        dd($orders);
+                        foreach ($orders as $order) {
+                            //检查是否是首冲
+
+                        }
+                    }
+                } else {
+                    var_dump($orderResponse);
+                }
+            }
+        } else {
+            dd($response);
+        }
+        return response('阅文书城回传完成');
+    }
+
+    /**
+     * 阅文上报新用户
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function ywNewUser(Request $request)
+    {
+        $user = $request->all();
+//        $exist = WyUser::where('open_id', $user['open_id'])->first();
+        $logger = new Logger('wyUser');
+        $logger->pushHandler(new StreamHandler(storage_path('logs/yw_user-' . date('Y-m-d') . '.log')));
+        $logger->info('user:', $user);
+//        if (!$exist) {
+//            WyUser::create($user);
+//        }
+        return response('ok');
+    }
+
+    public function ywSign($data)
+    {
+
+        $secretkey = 'ddfb7d33819a66da6057a16d66aed89f';
+        $req = $data;
+        ksort($req, SORT_REGULAR);
+//        asort($req);
+        $splicedString = '';
+        foreach ($req as $paramKey => $paramValue) {
+            $splicedString .= $paramKey . $paramValue;
+        }
+        return strtoupper(md5( $secretkey .$splicedString));
+    }
+
     public function httpResponse($res)
     {
         return json_decode($res->getBody()->getContents(), true);
